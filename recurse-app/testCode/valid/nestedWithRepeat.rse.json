@@ -1,0 +1,50 @@
+[
+  {
+    "start": 0,
+    "duration": 2,
+    "pitch": 60,
+    "velocity": 127
+  },
+  {
+    "start": 2,
+    "duration": 2,
+    "pitch": 60,
+    "velocity": 127
+  },
+  {
+    "start": 4,
+    "duration": 2,
+    "pitch": 60,
+    "velocity": 127
+  },
+  {
+    "start": 6,
+    "duration": 2,
+    "pitch": 60,
+    "velocity": 127
+  },
+  {
+    "start": 8,
+    "duration": 2,
+    "pitch": 60,
+    "velocity": 127
+  },
+  {
+    "start": 10,
+    "duration": 2,
+    "pitch": 60,
+    "velocity": 127
+  },
+  {
+    "start": 12,
+    "duration": 2,
+    "pitch": 60,
+    "velocity": 127
+  },
+  {
+    "start": 14,
+    "duration": 2,
+    "pitch": 60,
+    "velocity": 127
+  }
+]

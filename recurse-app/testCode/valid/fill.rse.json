@@ -1,0 +1,26 @@
+[
+  {
+    "start": 0,
+    "duration": 0.25,
+    "pitch": 72,
+    "velocity": 127
+  },
+  {
+    "start": 0.25,
+    "duration": 0.5,
+    "pitch": 74,
+    "velocity": 127
+  },
+  {
+    "start": 16,
+    "duration": 1,
+    "pitch": 76,
+    "velocity": 127
+  },
+  {
+    "start": 17,
+    "duration": 2,
+    "pitch": 78,
+    "velocity": 127
+  }
+]

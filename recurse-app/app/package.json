@@ -1,0 +1,28 @@
+{
+  "name": "recurse",
+  "version": "0.0.1",
+  "description": "",
+  "main": "compiled-scripts/recurse-cli.js",
+  "devDependencies": {
+    "tap-spec": "^4.1.1",
+    "tape": "~2.4.0"
+  },
+  "testling": {
+    "files": "compiled-scripts/**/*.spec.js",
+    "browsers": [
+      "phantomjs"
+    ]
+  },
+  "scripts": {
+    "test": "tape compiled-scripts/**/*.spec.js | tap-spec"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.9.0",
+    "lodash": "^4.3.0",
+    "node-watch": "^0.4.0",
+    "osc-min": "^1.1.1",
+    "sprintf-js": "^1.0.3"
+  }
+}
