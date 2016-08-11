@@ -6,7 +6,7 @@ import IContext from '../../function/IContext';
 import {IRecurseValue} from "../../core/type/IRecurseValue";
 
 export default class EndSelect implements INode {
-    public type: Entity = Entity.ENDSELECT;
+    public type: Entity = Entity.END_SELECT;
     public children: Array<INode> = [];
     public parent: INode;
 

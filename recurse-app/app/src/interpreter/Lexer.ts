@@ -87,7 +87,9 @@ export default class Lexer {
                 return {type: TokenType.DIVIDE, value: '/', pos: this.position++};
             }
         } else if (char === ';' && nextChar === ';') {
-            return {type: TokenType.DOUBLE_SEMI, value: ';;', pos: this.position++};
+            return {type: TokenType.DOUBLE_SEMI, value: ';;', pos: this.position += 2};
+        } else if (char === '.' && nextChar === '.') {
+            return {type: TokenType.DOUBLE_PERIOD, value: '..', pos: this.position += 2};
         } else {
             // Look it up in the table of operators
             var op = this.operatorTable[char];

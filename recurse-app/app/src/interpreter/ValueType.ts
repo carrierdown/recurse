@@ -1,11 +1,11 @@
 enum ValueType {
+    FILL,
     INTERVAL,
-    PITCH_OFFSET,
-    REST,
-    SELECT_INDEX,
     NOTE,
+    PITCH_OFFSET,
     RAW_NOTE, // MIDI pitch numbers 0-127
-    FILL
+    REST,
+    SELECT_INDEX
 }
 
 export default ValueType;

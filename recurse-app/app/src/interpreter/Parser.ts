@@ -32,6 +32,7 @@ import Scale from "../core/type/Scale";
 import SetScale from "../function/setter/SetScale";
 import Loop from "../function/setter/Loop";
 import Pitch from "../function/modifier/Pitch";
+import Range from "../function/operator/Range";
 
 export default class Parser {
     public static get SHORTHAND_TOKENS(): Array<TokenType> {
@@ -39,7 +40,7 @@ export default class Parser {
     }
 
     public static get SHORTHAND_ENTITIES(): Array<Entity> {
-        return [Entity.REST_SHORTHAND, Entity.REPEAT_SHORTHAND, Entity.ALT_SHORTHAND]
+        return [Entity.REST_SHORTHAND, Entity.REPEAT_SHORTHAND, Entity.ALT_SHORTHAND, Entity.RANGE_SHORTHAND]
     }
 
     public static get SETTING_ENTITIES(): Array<Entity> {
@@ -80,59 +81,34 @@ export default class Parser {
         }
 
         switch (type) {
-            case Entity.RM:
-                return new RhythmicMotive(parent, children);
-            case Entity.NS:
-                return new NoteSet(parent, children);
-            case Entity.INTERVAL:
-                return new Value(value, parent, ValueType.INTERVAL);
-            case Entity.NOTE:
-            case Entity.RAW_NOTE:
-                return new Value(value, parent, ValueType.NOTE);
-            case Entity.SELECT_INDEX:
-                return new Value(value, parent, ValueType.SELECT_INDEX);
-            case Entity.PITCH_OFFSET:
-                return new Value(value, parent, ValueType.PITCH_OFFSET);
-            case Entity.ALT_SHORTHAND:
-                return new Alternate(parent, true);
-            case Entity.ALT:
-                return new Alternate(parent, false);
-            case Entity.REPEAT_SHORTHAND:
-                return new Repeat(parent, true);
-            case Entity.REPEAT:
-                return new Repeat(parent, false);
-            case Entity.NESTED:
-                return new Nested(value, parent);
-            case Entity.RND:
-                return new Random(parent, children);
-            case Entity.REST_SHORTHAND:
-                return new Value(value, parent, ValueType.REST);
-            case Entity.REST:
-                return new Value(value, parent, ValueType.REST);
-            case Entity.FILL:
-                return new Value(null, parent, ValueType.FILL);
-            case Entity.ROOT:
-                return new Root();
-            case Entity.CHAIN:
-                return new Chain(parent, children);
-            case Entity.PITCH:
-                return new Pitch(parent, children);
-            case Entity.TRANSPOSE:
-                return new Transpose(parent, children);
-            case Entity.EVEN:
-                return new Select(parent, SelectStrategy.even);
-            case Entity.ODD:
-                return new Select(parent, SelectStrategy.odd);
-            case Entity.FIRST:
-                return new Select(parent, SelectStrategy.first);
-            case Entity.LAST:
-                return new Select(parent, SelectStrategy.last);
-            case Entity.SELECT:
-                return new Select(parent, SelectStrategy.indexList);
-            case Entity.ENDSELECT:
-                return new EndSelect(parent);
-            case Entity.INTERPOLATE:
-                return new Interpolate(parent);
+            case Entity.ALT: return new Alternate(parent, false);
+            case Entity.ALT_SHORTHAND: return new Alternate(parent, true);
+            case Entity.CHAIN: return new Chain(parent, children);
+            case Entity.END_SELECT: return new EndSelect(parent);
+            case Entity.EVEN: return new Select(parent, SelectStrategy.even);
+            case Entity.FILL: return new Value(null, parent, ValueType.FILL);
+            case Entity.FIRST: return new Select(parent, SelectStrategy.first);
+            case Entity.INTERPOLATE: return new Interpolate(parent);
+            case Entity.INTERVAL: return new Value(value, parent, ValueType.INTERVAL);
+            case Entity.LAST: return new Select(parent, SelectStrategy.last);
+            case Entity.NESTED: return new Nested(value, parent);
+            case Entity.NOTE: case Entity.RAW_NOTE: return new Value(value, parent, ValueType.NOTE);
+            case Entity.NS: return new NoteSet(parent, children);
+            case Entity.ODD: return new Select(parent, SelectStrategy.odd);
+            case Entity.PITCH: return new Pitch(parent, children);
+            case Entity.PITCH_OFFSET: return new Value(value, parent, ValueType.PITCH_OFFSET);
+            case Entity.RANGE: return new Range(parent, false);
+            case Entity.RANGE_SHORTHAND: return new Range(parent, true);
+            case Entity.REPEAT: return new Repeat(parent, false);
+            case Entity.REPEAT_SHORTHAND: return new Repeat(parent, true);
+            case Entity.REST: return new Value(value, parent, ValueType.REST);
+            case Entity.REST_SHORTHAND: return new Value(value, parent, ValueType.REST);
+            case Entity.RM: return new RhythmicMotive(parent, children);
+            case Entity.RND: return new Random(parent, children);
+            case Entity.ROOT: return new Root();
+            case Entity.SELECT: return new Select(parent, SelectStrategy.indexList);
+            case Entity.SELECT_INDEX: return new Value(value, parent, ValueType.SELECT_INDEX);
+            case Entity.TRANSPOSE: return new Transpose(parent, children);
             default:
                 console.log('Parser.createNode: Entity not matching available node type', Entity[type]);
         }
@@ -140,51 +116,54 @@ export default class Parser {
 
     public static recurseEntityFromIdentifier(entity: string): Entity {
         switch (entity.toLowerCase()) {
-            case 'rm':
-            case 'rhythmicmotive':
-            case 'rhythm':
-                return Entity.RM;
+            case 'alt':
+            case 'alternate':
+                return Entity.ALT;
+            case 'endselect':
+            case 'end':
+                return Entity.END_SELECT;
+            case 'even':
+                return Entity.EVEN;
+            case 'first':
+                return Entity.FIRST;
+            case 'loop':
+                return Entity.LOOP_FACTOR;
+            case 'last':
+                return Entity.LAST;
             case 'ns':
             case 'noteSet':
             case 'notes':
                 return Entity.NS;
-            case 'tr':
-            case 'transpose':
-                return Entity.TRANSPOSE;
-            case 'pitch':
-                return Entity.PITCH;
-            case 'even':
-                return Entity.EVEN;
             case 'odd':
                 return Entity.ODD;
-            case 'select':
-            case 'sel':
-                return Entity.SELECT;
-            case 'first':
-                return Entity.FIRST;
-            case 'last':
-                return Entity.LAST;
-            case 'endselect':
-            case 'end':
-                return Entity.ENDSELECT;
-            case 'random':
-            case 'rnd':
-                return Entity.RND;
-            case 'alt':
-            case 'alternate':
-                return Entity.ALT;
-            case 'rest':
-                return Entity.REST;
+            case 'length':
+                return Entity.PATTERN_LENGTH;
+            case 'pitch':
+                return Entity.PITCH;
+            case 'rng':
+            case 'range':
+                return Entity.RANGE;
             case 'rep':
             case 'repeat':
                 return Entity.REPEAT;
-            case 'length':
-                return Entity.PATTERN_LENGTH;
+            case 'rest':
+                return Entity.REST;
+            case 'rm':
+            case 'rhythmicmotive':
+            case 'rhythm':
+                return Entity.RM;
+            case 'random':
+            case 'rnd':
+                return Entity.RND;
+            case 'select':
+            case 'sel':
+                return Entity.SELECT;
             case 'setscale':
             case 'scale':
                 return Entity.SET_SCALE;
-            case 'loop':
-                return Entity.LOOP_FACTOR;
+            case 'tr':
+            case 'transpose':
+                return Entity.TRANSPOSE;
             default:
                 console.log('couldn\'t find identifier...');
         }
@@ -300,6 +279,16 @@ export default class Parser {
                             }
                         }
                         current.children.push(Parser.createNode(entityType, current, tokenSet[i].value));
+                    } else if (nextToken.type === TokenType.DOUBLE_PERIOD) {
+                        // this is a shorthand range statement
+                        if ([Entity.RANGE_SHORTHAND, Entity.ALT_SHORTHAND, Entity.REPEAT_SHORTHAND].indexOf(current.type) === -1) {
+                            let rangeNode = Parser.createNode(Entity.RANGE_SHORTHAND, current);
+                            current.children.push(rangeNode);
+                            current = rangeNode;
+                        } else {
+                            // todo: error
+                        }
+                        current.children.push(Parser.createNode(entityType, current, tokenSet[i].value));
                     } else if (nextToken.type === TokenType.LEFT_PAREN) {
                         // this is a nested statement
                         current.children.push(Parser.createNode(Entity.NESTED, current, tokenSet[i].value));
@@ -381,6 +370,9 @@ export default class Parser {
                     // todo: fix dupl code for creating new chain
                     newTrack.children.push(Parser.createNode(Entity.CHAIN, newTrack));
                     current = newTrack.children[newTrack.children.length - 1];
+                    break;
+                case TokenType.DOUBLE_PERIOD:
+
                     break;
 /*
                 case TokenType.PIPE:

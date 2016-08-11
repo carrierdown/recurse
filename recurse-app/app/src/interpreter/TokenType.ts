@@ -1,41 +1,42 @@
 import createLookupTable from "../core/util/createLookupTable";
 
 export enum TokenType {
-    START,
-    PLUS,
-    MINUS,
-    MULTIPLY,
-    DIVIDE,
-    COMMENT,
-    QUOTE,
-    SINGLE_QUOTE,
-    NOTE,
-    NUMBER,
-    IDENTIFIER,
-    PERIOD,
+    AMPERSAND,
     BACKSLASH,
     COLON,
-    PERCENT,
-    PIPE,
-    EXCLAMATION,
-    QUESTION,
-    POUND,
-    AMPERSAND,
-    SEMI,
-    DOUBLE_SEMI,
     COMMA,
-    LEFT_PAREN,
-    RIGHT_PAREN,
-    LEFT_ANGLE,
-    RIGHT_ANGLE,
-    LEFT_BRACE,
-    RIGHT_BRACE,
-    LEFT_BRACKET,
-    RIGHT_BRACKET,
-    EQUALS,
+    COMMENT,
+    DIVIDE,
+    DOUBLE_PERIOD,
+    DOUBLE_SEMI,
     END,
-    UNDERSCORE,
-    REPEAT
+    EQUALS,
+    EXCLAMATION,
+    IDENTIFIER,
+    LEFT_ANGLE,
+    LEFT_BRACE,
+    LEFT_BRACKET,
+    LEFT_PAREN,
+    MINUS,
+    MULTIPLY,
+    NOTE,
+    NUMBER,
+    PERCENT,
+    PERIOD,
+    PIPE,
+    PLUS,
+    POUND,
+    QUESTION,
+    QUOTE,
+    REPEAT,
+    RIGHT_ANGLE,
+    RIGHT_BRACE,
+    RIGHT_BRACKET,
+    RIGHT_PAREN,
+    SEMI,
+    SINGLE_QUOTE,
+    START,
+    UNDERSCORE
 }
 
 var expects = [
@@ -46,6 +47,14 @@ var expects = [
     {
         token: TokenType.SEMI,
         expects: [TokenType.IDENTIFIER]
+    },
+    {
+        token: TokenType.DOUBLE_SEMI,
+        expects: [TokenType.IDENTIFIER]
+    },
+    {
+        token: TokenType.DOUBLE_PERIOD,
+        expects: [TokenType.NUMBER]
     },
     {
         token: TokenType.IDENTIFIER,
@@ -61,7 +70,7 @@ var expects = [
     },
     {
         token: TokenType.NUMBER,
-        expects: [TokenType.COMMA, TokenType.LEFT_PAREN, TokenType.RIGHT_PAREN, TokenType.SINGLE_QUOTE, TokenType.REPEAT]
+        expects: [TokenType.COMMA, TokenType.LEFT_PAREN, TokenType.RIGHT_PAREN, TokenType.SINGLE_QUOTE, TokenType.REPEAT, TokenType.DOUBLE_PERIOD]
     },
     {
         token: TokenType.COMMA,
