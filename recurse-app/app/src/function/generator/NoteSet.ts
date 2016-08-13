@@ -19,7 +19,6 @@ export default class NoteSet implements INode {
         for (let child of this.children) {
             results = results.concat(child.generate(context));
         }
-        // need to decide whether regular notes should also be modified to currently set scale, or if only scale degrees should behave this way
         let i = 0;
         for (let result of context.results) {
             if (result.pitches.length === 0) {
