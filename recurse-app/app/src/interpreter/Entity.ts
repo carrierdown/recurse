@@ -31,6 +31,7 @@ enum Entity {
     RM,
     RND,
     ROOT,
+    TRACK,
     SELECT,
     SELECT_INDEX,
     SET_SCALE,

@@ -13,7 +13,7 @@ export default class Root implements INode {
         this.children = [];
     }
 
-    // Root serves as a track construct. For each child we want to modify context a bit in certain cases
+    // Root serves as a clip/container construct.
     public generate(context: IContext): Array<IRecurseValue> {
         //var offsetMultiplier: number = 0;
         for (let child of this.children) {

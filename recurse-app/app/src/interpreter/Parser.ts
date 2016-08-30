@@ -184,6 +184,11 @@ export default class Parser {
         return parenLevel === 0;
     }
 
+    public static addNodeToChildrenAndRetrieve(node: INode, nodeToAdd: INode): INode {
+        node.children.push(nodeToAdd);
+        return node.children[node.children.length - 1];
+    }
+
     public static parseTokensToSyntaxTree(tokenSet: Array<IToken>): RecurseResult<ISyntaxTree> {
         var current: INode = Parser.createNode(Entity.ROOT, null),
             syntaxTree: ISyntaxTree = new SyntaxTree(),
@@ -196,8 +201,8 @@ export default class Parser {
         }
 
         syntaxTree.rootNodes[0] = current;
-        current.children.push(Parser.createNode(Entity.CHAIN, current));
-        current = current.children[current.children.length - 1];
+        current = Parser.addNodeToChildrenAndRetrieve(current, Parser.createNode(Entity.TRACK, current));
+        current = Parser.addNodeToChildrenAndRetrieve(current, Parser.createNode(Entity.CHAIN, current));
 
         for (let i = 0; i < tokenSet.length; i++) {
             let nextToken = Parser.tokenSetLookAhead(tokenSet, i, 1);
@@ -356,7 +361,7 @@ export default class Parser {
                     current = Parser.exitShorthandStatements(current);
                     break;
                 case TokenType.SEMI:
-                    // todo: exit current chain and start a new one
+/*
                     if (current.type !== Entity.CHAIN) {
                         return result.setError(ErrorMessages.getError(ErrorMessages.NOT_IN_CHAIN));
                     }
@@ -364,15 +369,27 @@ export default class Parser {
                     current = current.parent.children[current.parent.children.length - 1];
                     break;
                 case TokenType.DOUBLE_SEMI:
-                    // creates new track (root object)
-                    let newTrack: INode = Parser.createNode(Entity.ROOT, null);
+*/
+                    // creates new track
+                    let root: INode = Parser.getParentNodeOfType(Entity.ROOT, current);
+                    if (root !== null) {
+                        current = Parser.addNodeToChildrenAndRetrieve(root, Parser.createNode(Entity.TRACK, root));
+                        current = Parser.addNodeToChildrenAndRetrieve(current, Parser.createNode(Entity.CHAIN, current));
+                    } else {
+                        //todo: throw error
+                    }
+                    let newTrack: INode = Parser.createNode(Entity.TRACK, null);
                     syntaxTree.rootNodes.push(newTrack);
                     // todo: fix dupl code for creating new chain
                     newTrack.children.push(Parser.createNode(Entity.CHAIN, newTrack));
                     current = newTrack.children[newTrack.children.length - 1];
                     break;
-                case TokenType.DOUBLE_PERIOD:
-
+                case TokenType.DOUBLE_SEMI:
+                    // todo: create new clip
+                    let newRoot: INode = Parser.createNode(Entity.ROOT, null);
+                    syntaxTree.rootNodes.push(newRoot);
+                    current = Parser.addNodeToChildrenAndRetrieve(newRoot, Parser.createNode(Entity.TRACK, newRoot));
+                    current = Parser.addNodeToChildrenAndRetrieve(current, Parser.createNode(Entity.CHAIN, current));
                     break;
 /*
                 case TokenType.PIPE:
@@ -459,6 +476,19 @@ export default class Parser {
         return current;
     }
 
+    private static getParentNodeOfType(entity: Entity, node: INode): INode {
+        var current: INode = null;
+        if (node.type === entity) {
+            return node;
+        }
+        current = node.parent;
+        while (current.type !== entity || current.type !== null) {
+            current = current.parent;
+        }
+        return current;
+    }
+
+    // todo: remove
     private static getCurrentChain(node: INode): INode {
         var current: INode = null;
         if (node.type === Entity.CHAIN) {
