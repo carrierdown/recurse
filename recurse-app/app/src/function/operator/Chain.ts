@@ -24,6 +24,7 @@ export default class Chain implements INode {
         for (let setting of this.settings) {
             setting.apply(context);
         }
+        console.log('settings applied', context);
         for (let child of this.children) {
             child.generate(context);
         }

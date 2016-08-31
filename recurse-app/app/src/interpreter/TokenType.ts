@@ -45,6 +45,10 @@ var expects = [
         expects: [TokenType.IDENTIFIER]
     },
     {
+        token: TokenType.PIPE,
+        expects: [TokenType.IDENTIFIER]
+    },
+    {
         token: TokenType.SEMI,
         expects: [TokenType.IDENTIFIER]
     },
@@ -58,7 +62,7 @@ var expects = [
     },
     {
         token: TokenType.IDENTIFIER,
-        expects: [TokenType.IDENTIFIER, TokenType.LEFT_PAREN, TokenType.SEMI, TokenType.DOUBLE_SEMI]
+        expects: [TokenType.IDENTIFIER, TokenType.LEFT_PAREN, TokenType.SEMI, TokenType.DOUBLE_SEMI, TokenType.PIPE]
     },
     {
         token: TokenType.LEFT_PAREN,
@@ -66,7 +70,7 @@ var expects = [
     },
     {
         token: TokenType.RIGHT_PAREN,
-        expects: [TokenType.IDENTIFIER, TokenType.RIGHT_PAREN, TokenType.COMMA, TokenType.SEMI, TokenType.DOUBLE_SEMI]
+        expects: [TokenType.IDENTIFIER, TokenType.RIGHT_PAREN, TokenType.COMMA, TokenType.SEMI, TokenType.DOUBLE_SEMI, TokenType.PIPE]
     },
     {
         token: TokenType.NUMBER,

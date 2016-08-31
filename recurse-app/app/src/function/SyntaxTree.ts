@@ -9,9 +9,11 @@ export default class SyntaxTree implements ISyntaxTree {
     public rootNodes: Array<INode> = [];
 
     public generate(): Array<RecurseObject> {
-        var contexts: Array<IContext> = [];
+        var contextContainers: Array<any> = [];
+        // need to rewrite this a bit -> something like the below but we need to change interfaces a bit or something
         for (let rootNode of this.rootNodes) {
-            contexts.push({
+            contextContainers.push({content: []});
+/*
                 results: [],
                 selectedIndexes: [],
                 selectionActive: false,
@@ -24,12 +26,16 @@ export default class SyntaxTree implements ISyntaxTree {
                 scale: new Scale(),
                 rootOct: 5
             });
+*/
             rootNode.generate(contexts[contexts.length - 1]);
         }
 
         var results: Array<RecurseObject> = [];
-        for (let context of contexts) {
-            results = results.concat(context.results);
+        for (let contextContainer of contextContainers) {
+            for (let context of context.contents) {
+                results = results.concat(context.results);
+            }
+
         }
         return results;
     }

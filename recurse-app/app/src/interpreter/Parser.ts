@@ -33,6 +33,7 @@ import SetScale from "../function/setter/SetScale";
 import Loop from "../function/setter/Loop";
 import Pitch from "../function/modifier/Pitch";
 import Range from "../function/operator/Range";
+import Track from "../function/base/Track";
 
 export default class Parser {
     public static get SHORTHAND_TOKENS(): Array<TokenType> {
@@ -108,6 +109,7 @@ export default class Parser {
             case Entity.ROOT: return new Root();
             case Entity.SELECT: return new Select(parent, SelectStrategy.indexList);
             case Entity.SELECT_INDEX: return new Value(value, parent, ValueType.SELECT_INDEX);
+            case Entity.TRACK: return new Track(parent);
             case Entity.TRANSPOSE: return new Transpose(parent, children);
             default:
                 console.log('Parser.createNode: Entity not matching available node type', Entity[type]);
@@ -184,6 +186,11 @@ export default class Parser {
         return parenLevel === 0;
     }
 
+    public static addNodeToChildrenAndRetrieve(node: INode, nodeTypeToAdd: Entity): INode {
+        node.children.push(Parser.createNode(nodeTypeToAdd, node));
+        return node.children[node.children.length - 1];
+    }
+
     public static parseTokensToSyntaxTree(tokenSet: Array<IToken>): RecurseResult<ISyntaxTree> {
         var current: INode = Parser.createNode(Entity.ROOT, null),
             syntaxTree: ISyntaxTree = new SyntaxTree(),
@@ -196,8 +203,8 @@ export default class Parser {
         }
 
         syntaxTree.rootNodes[0] = current;
-        current.children.push(Parser.createNode(Entity.CHAIN, current));
-        current = current.children[current.children.length - 1];
+        current = Parser.addNodeToChildrenAndRetrieve(current, Entity.TRACK);
+        current = Parser.addNodeToChildrenAndRetrieve(current, Entity.CHAIN);
 
         for (let i = 0; i < tokenSet.length; i++) {
             let nextToken = Parser.tokenSetLookAhead(tokenSet, i, 1);
@@ -356,16 +363,30 @@ export default class Parser {
                     //}
                     current = Parser.exitShorthandStatements(current);
                     break;
-                case TokenType.SEMI:
-                    // todo: update tests to reflect changed functionality wrt ; and ;;
-                    // creates new track (root object)
-                    let newTrack: INode = Parser.createNode(Entity.ROOT, null);
-                    syntaxTree.rootNodes.push(newTrack);
-                    // todo: fix dupl code for creating new chain
-                    newTrack.children.push(Parser.createNode(Entity.CHAIN, newTrack));
-                    current = newTrack.children[newTrack.children.length - 1];
+                case TokenType.PIPE: // experimental: | now signifies what ; used to mean earlier
+                    if (current.type !== Entity.CHAIN) {
+                        return result.setError(ErrorMessages.getError(ErrorMessages.NOT_IN_CHAIN));
+                    }
+                    current = Parser.addNodeToChildrenAndRetrieve(current.parent, Entity.CHAIN);
                     break;
-/* OLD functionality for semi: create new chain
+                case TokenType.SEMI:
+                    // creates new track
+                    let root: INode = Parser.getParentNodeOfType(Entity.ROOT, current);
+                    if (root !== null) {
+                        current = Parser.addNodeToChildrenAndRetrieve(root, Entity.TRACK);
+                        current = Parser.addNodeToChildrenAndRetrieve(current, Entity.CHAIN);
+                    } else {
+                        //todo: throw error
+                    }
+                    break;
+                case TokenType.DOUBLE_SEMI:
+                    let newRoot: INode = Parser.createNode(Entity.ROOT, null);
+                    syntaxTree.rootNodes.push(newRoot);
+                    current = Parser.addNodeToChildrenAndRetrieve(newRoot, Entity.TRACK);
+                    current = Parser.addNodeToChildrenAndRetrieve(current, Entity.CHAIN);
+                    break;
+/*
+                case TokenType.PIPE:
                     if (current.type !== Entity.CHAIN) {
                         return result.setError(ErrorMessages.getError(ErrorMessages.NOT_IN_CHAIN));
                     }
@@ -444,6 +465,19 @@ export default class Parser {
         return current;
     }
 
+    private static getParentNodeOfType(entity: Entity, node: INode): INode {
+        var current: INode = null;
+        if (node.type === entity) {
+            return node;
+        }
+        current = node.parent;
+        while (current !== null && current.type !== entity) {
+            current = current.parent;
+        }
+        return current;
+    }
+
+    // todo: remove
     private static getCurrentChain(node: INode): INode {
         var current: INode = null;
         if (node.type === Entity.CHAIN) {

@@ -57,7 +57,7 @@ tape('Testing compiler with valid code', (test) => {
         }
     }, () => {
         test.end();
-    }/*, 'cutBleedingNotes.rse'*/);
+    }, 'loopFactor.rse');
 });
 
 tape('Testing compiler with invalid code', (test) => {
