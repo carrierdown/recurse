@@ -350,20 +350,14 @@ export default class Parser {
                     break;
                 case TokenType.COMMA:
                     // if we're in a chain, the comma breaks it
+                    // if we're in a chain, the comma breaks it
                     //if (current.type === Entity.CHAIN) {
                     //    current = current.parent;
                     //}
                     current = Parser.exitShorthandStatements(current);
                     break;
                 case TokenType.SEMI:
-                    // todo: exit current chain and start a new one
-                    if (current.type !== Entity.CHAIN) {
-                        return result.setError(ErrorMessages.getError(ErrorMessages.NOT_IN_CHAIN));
-                    }
-                    current.parent.children.push(Parser.createNode(Entity.CHAIN, current.parent));
-                    current = current.parent.children[current.parent.children.length - 1];
-                    break;
-                case TokenType.DOUBLE_SEMI:
+                    // todo: update tests to reflect changed functionality wrt ; and ;;
                     // creates new track (root object)
                     let newTrack: INode = Parser.createNode(Entity.ROOT, null);
                     syntaxTree.rootNodes.push(newTrack);
@@ -371,26 +365,17 @@ export default class Parser {
                     newTrack.children.push(Parser.createNode(Entity.CHAIN, newTrack));
                     current = newTrack.children[newTrack.children.length - 1];
                     break;
-                case TokenType.DOUBLE_PERIOD:
-
-                    break;
-/*
-                case TokenType.PIPE:
+/* OLD functionality for semi: create new chain
                     if (current.type !== Entity.CHAIN) {
-                        // no chain node currently exists, so we create a new chain node and add the most recently created child node to it
-                        if (!Parser.hasChildren(current)) {
-                            console.log('parse error - no chainable nodes present');
-                            break;
-                        }
-                        let mostRecentChildNode: INode = _.last(current.children);
-                        let chainNode: INode = Parser.createNode(Entity.CHAIN, current);
-                        let clonedNode: INode = Parser.createNode(mostRecentChildNode.type, chainNode, mostRecentChildNode['value'] || null, mostRecentChildNode.children);
-                        chainNode.children.push(clonedNode);
-                        current.children[current.children.length - 1] = chainNode;
-                        current = chainNode;
+                        return result.setError(ErrorMessages.getError(ErrorMessages.NOT_IN_CHAIN));
                     }
+                    current.parent.children.push(Parser.createNode(Entity.CHAIN, current.parent));
+                    current = current.parent.children[current.parent.children.length - 1];
                     break;
 */
+                case TokenType.DOUBLE_SEMI:
+                    // todo: create new clip
+                    break;
                 case TokenType.IDENTIFIER:
                     let entity = Parser.recurseEntityFromIdentifier(tokenSet[i].value);
                     if (entity === Entity.INVALID) {
