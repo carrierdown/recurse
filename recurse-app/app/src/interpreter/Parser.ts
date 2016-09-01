@@ -33,7 +33,6 @@ import SetScale from "../function/setter/SetScale";
 import Loop from "../function/setter/Loop";
 import Pitch from "../function/modifier/Pitch";
 import Range from "../function/operator/Range";
-import Track from "../function/base/Track";
 
 export default class Parser {
     public static get SHORTHAND_TOKENS(): Array<TokenType> {
@@ -77,7 +76,7 @@ export default class Parser {
     public static createNode(type: Entity, parent: INode = null, value: any = null, children: Array<INode> = []): INode {
         if (type === Entity.NOTE) {
             value = Note.pitchFromNoteName(value);
-        } else {
+        } else if (value !== true) {
             value = parseInt(value, 10);
         }
 
@@ -106,10 +105,9 @@ export default class Parser {
             case Entity.REST_SHORTHAND: return new Value(value, parent, ValueType.REST);
             case Entity.RM: return new RhythmicMotive(parent, children);
             case Entity.RND: return new Random(parent, children);
-            case Entity.ROOT: return new Root();
+            case Entity.ROOT: return new Root(value === true);
             case Entity.SELECT: return new Select(parent, SelectStrategy.indexList);
             case Entity.SELECT_INDEX: return new Value(value, parent, ValueType.SELECT_INDEX);
-            case Entity.TRACK: return new Track(parent);
             case Entity.TRANSPOSE: return new Transpose(parent, children);
             default:
                 console.log('Parser.createNode: Entity not matching available node type', Entity[type]);
@@ -203,7 +201,6 @@ export default class Parser {
         }
 
         syntaxTree.rootNodes[0] = current;
-        current = Parser.addNodeToChildrenAndRetrieve(current, Entity.TRACK);
         current = Parser.addNodeToChildrenAndRetrieve(current, Entity.CHAIN);
 
         for (let i = 0; i < tokenSet.length; i++) {
@@ -357,7 +354,6 @@ export default class Parser {
                     break;
                 case TokenType.COMMA:
                     // if we're in a chain, the comma breaks it
-                    // if we're in a chain, the comma breaks it
                     //if (current.type === Entity.CHAIN) {
                     //    current = current.parent;
                     //}
@@ -367,23 +363,21 @@ export default class Parser {
                     if (current.type !== Entity.CHAIN) {
                         return result.setError(ErrorMessages.getError(ErrorMessages.NOT_IN_CHAIN));
                     }
+                    console.log('here');
                     current = Parser.addNodeToChildrenAndRetrieve(current.parent, Entity.CHAIN);
+                    console.log('and there');
                     break;
                 case TokenType.SEMI:
                     // creates new track
-                    let root: INode = Parser.getParentNodeOfType(Entity.ROOT, current);
-                    if (root !== null) {
-                        current = Parser.addNodeToChildrenAndRetrieve(root, Entity.TRACK);
-                        current = Parser.addNodeToChildrenAndRetrieve(current, Entity.CHAIN);
-                    } else {
-                        //todo: throw error
-                    }
+                    let newTrackRoot: INode = Parser.createNode(Entity.ROOT, null, false);
+                    syntaxTree.rootNodes.push(newTrackRoot);
+                    current = Parser.addNodeToChildrenAndRetrieve(newTrackRoot, Entity.CHAIN);
                     break;
                 case TokenType.DOUBLE_SEMI:
-                    let newRoot: INode = Parser.createNode(Entity.ROOT, null);
-                    syntaxTree.rootNodes.push(newRoot);
-                    current = Parser.addNodeToChildrenAndRetrieve(newRoot, Entity.TRACK);
-                    current = Parser.addNodeToChildrenAndRetrieve(current, Entity.CHAIN);
+                    // creates a new clip
+                    let newClipRoot: INode = Parser.createNode(Entity.ROOT, null, true);
+                    syntaxTree.rootNodes.push(newClipRoot);
+                    current = Parser.addNodeToChildrenAndRetrieve(newClipRoot, Entity.CHAIN);
                     break;
 /*
                 case TokenType.PIPE:
@@ -394,9 +388,6 @@ export default class Parser {
                     current = current.parent.children[current.parent.children.length - 1];
                     break;
 */
-                case TokenType.DOUBLE_SEMI:
-                    // todo: create new clip
-                    break;
                 case TokenType.IDENTIFIER:
                     let entity = Parser.recurseEntityFromIdentifier(tokenSet[i].value);
                     if (entity === Entity.INVALID) {

@@ -31,18 +31,18 @@ export default class Compiler {
 //        console.log('settings are now', this.settings);
     }
 
-    public compile(code: string): RecurseResult<NoteEvent[]> {
+    public compile(code: string): RecurseResult<NoteEvent[][]> {
         var lexer: Lexer,
             tokens: Array<IToken>,
             parseResult: RecurseResult<ISyntaxTree>,
-            compileResult: RecurseResult<NoteEvent[]>,
-            noteEvents: Array<NoteEvent>,
+            compileResult: RecurseResult<NoteEvent[][]>,
+            noteEvents: NoteEvent[][],
             jsonOutput: string;
 
         lexer = new Lexer();
         tokens = lexer.getTokenSet(code.toString());
         parseResult = Parser.parseTokensToSyntaxTree(tokens);
-        compileResult = new RecurseResult<NoteEvent[]>(parseResult.status, parseResult.error);
+        compileResult = new RecurseResult<NoteEvent[][]>(parseResult.status, parseResult.error);
 
         if (parseResult.isOk()) {
             if (this.settings.debug) {

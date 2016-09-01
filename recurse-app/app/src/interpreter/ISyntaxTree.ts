@@ -3,7 +3,7 @@ import RecurseObject from '../core/type/RecurseObject';
 
 interface ISyntaxTree {
     rootNodes: Array<INode>;
-    generate: () => Array<RecurseObject>;
+    generate: () => Array<Array<RecurseObject>>;
 }
 
 export default ISyntaxTree;

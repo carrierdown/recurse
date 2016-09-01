@@ -32,7 +32,7 @@ function forEachFileInDir(dirname: string, callback: (filename: string, content:
 
 tape('Testing compiler with valid code', (test) => {
     var compiler: Compiler = new Compiler(),
-        compile: RecurseResult<NoteEvent[]>,
+        compile: RecurseResult<NoteEvent[][]>,
         dirname: string = path.join(__dirname, '../../../testCode/valid/');
 
     compiler.setDebug(true);
@@ -46,23 +46,26 @@ tape('Testing compiler with valid code', (test) => {
         test.equal(compile.status, RecurseStatus.OK, `file: ${filename} containing ${content} should compile ok`);
 
         if (expectedContent.length > 0) {
-            let expectedResults = JSON.parse(expectedContent) as NoteEvent[];
-            test.equal(expectedResults.length, compile.result.length, `Expected output length ${expectedResults.length} and actual output length ${compile.result.length} should be the same`);
-            for (let i = 0; i < expectedResults.length; i++) {
-                test.equal(expectedResults[i].start, compile.result[i].start, `Property "start" of expected output (${expectedResults[i].start}) and actual output (${compile.result[i].start}) should be the same (${filename})`);
-                test.equal(expectedResults[i].duration, compile.result[i].duration, `Property "duration" of expected output (${expectedResults[i].duration}) and actual output (${compile.result[i].duration}) should be the same (${filename})`);
-                test.equal(expectedResults[i].pitch, compile.result[i].pitch, `Property "pitch" of expected output (${expectedResults[i].pitch}) and actual output (${compile.result[i].pitch}) should be the same (${filename})`);
-                test.equal(expectedResults[i].velocity, compile.result[i].velocity, `Property "velocity" of expected output (${expectedResults[i].velocity}) and actual output (${compile.result[i].velocity}) should be the same (${filename})`);
+            let expectedResultsSets = JSON.parse(expectedContent) as NoteEvent[][];
+            for (let i = 0; i < expectedResultsSets.length; i++) {
+                let expectedResults = expectedResultsSets[i];
+                test.equal(expectedResults.length, compile.result[i].length, `Expected output length ${expectedResults.length} and actual output length ${compile.result[i].length} should be the same`);
+                for (let x = 0; x < expectedResults.length; x++) {
+                    test.equal(expectedResults[x].start, compile.result[i][x].start, `Property "start" of expected output (${expectedResults[x].start}) and actual output (${compile.result[i][x].start}) should be the same (${filename})`);
+                    test.equal(expectedResults[x].duration, compile.result[i][x].duration, `Property "duration" of expected output (${expectedResults[x].duration}) and actual output (${compile.result[i][x].duration}) should be the same (${filename})`);
+                    test.equal(expectedResults[x].pitch, compile.result[i][x].pitch, `Property "pitch" of expected output (${expectedResults[x].pitch}) and actual output (${compile.result[i][x].pitch}) should be the same (${filename})`);
+                    test.equal(expectedResults[x].velocity, compile.result[i][x].velocity, `Property "velocity" of expected output (${expectedResults[x].velocity}) and actual output (${compile.result[i][x].velocity}) should be the same (${filename})`);
+                }
             }
         }
     }, () => {
         test.end();
-    }, 'loopFactor.rse');
+    }/*, 'multipleClips.rse'*/);
 });
 
 tape('Testing compiler with invalid code', (test) => {
     var compiler: Compiler = new Compiler(),
-        result: RecurseResult<NoteEvent[]>,
+        result: RecurseResult<NoteEvent[][]>,
         dirname: string = path.join(__dirname, '../../../testCode/invalid/');
 
     compiler.setDebug(false);
@@ -88,13 +91,13 @@ tape('Testing random function', (test) => {
     compiler.setPreview(true);
 
     // rnd invokes are repeated manually rather than being looped so that we avoid issues with events being chopped of at the end which are hard to test. We instead use * to make sure that only "clean" events are produced.
-    let compiled: RecurseResult<NoteEvent[]> = compiler.compile('rm(rnd(4,6,8), rnd(1,2,3), rnd(4,6,8), rnd(1,2,3), rnd(4,6,8), rnd(1,2,3), rnd(4,6,8), rnd(1,2,3), *) ns(c3)');
+    let compiled: RecurseResult<NoteEvent[][]> = compiler.compile('rm(rnd(4,6,8), rnd(1,2,3), rnd(4,6,8), rnd(1,2,3), rnd(4,6,8), rnd(1,2,3), rnd(4,6,8), rnd(1,2,3), *) ns(c3)');
 
     test.equal(compiled.status, RecurseStatus.OK, `Compilation should be successful`);
     let i = 0;
     let evenValues: number[] = [],
         oddValues: number[] = [];
-    for (let result of compiled.result) {
+    for (let result of compiled.result[0]) {
         if (i % 2 === 0) {
             test.ok(result.duration === 1 || result.duration === 1.5 || result.duration === 2, `Expected 1 or 1.5 or 2, and got ${result.duration}`);
             evenValues.push(result.duration);

@@ -37,7 +37,7 @@ if (program['args'].length > 0) {
 
 function doCompile(filename, preview, debug) {
     var compiler = new Compiler(),
-        result: RecurseResult<NoteEvent[]> = new RecurseResult<NoteEvent[]>();
+        result: RecurseResult<NoteEvent[][]> = new RecurseResult<NoteEvent[][]>();
 
     compiler.setPreview(preview);
     compiler.setDebug(debug);

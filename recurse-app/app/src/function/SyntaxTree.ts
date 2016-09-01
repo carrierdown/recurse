@@ -1,3 +1,5 @@
+import _ = require('lodash');
+
 import INode from '../interpreter/INode';
 import ISyntaxTree from '../interpreter/ISyntaxTree';
 import RecurseObject from '../core/type/RecurseObject';
@@ -8,12 +10,10 @@ import Note from "../core/type/Note";
 export default class SyntaxTree implements ISyntaxTree {
     public rootNodes: Array<INode> = [];
 
-    public generate(): Array<RecurseObject> {
-        var contextContainers: Array<any> = [];
-        // need to rewrite this a bit -> something like the below but we need to change interfaces a bit or something
+    public generate(): Array<Array<RecurseObject>> {
+        var contexts: Array<IContext> = [];
         for (let rootNode of this.rootNodes) {
-            contextContainers.push({content: []});
-/*
+            contexts.push({
                 results: [],
                 selectedIndexes: [],
                 selectionActive: false,
@@ -24,19 +24,22 @@ export default class SyntaxTree implements ISyntaxTree {
                 endPosition: 0,
                 prePhase: false,
                 scale: new Scale(),
-                rootOct: 5
+                rootOct: 5,
+                createNewClip: false
             });
-*/
             rootNode.generate(contexts[contexts.length - 1]);
         }
 
-        var results: Array<RecurseObject> = [];
-        for (let contextContainer of contextContainers) {
-            for (let context of context.contents) {
-                results = results.concat(context.results);
+        var results: Array<Array<RecurseObject>> = [];
+        var resultBuffer: Array<RecurseObject> = [];
+        for (let context of contexts) {
+            if (context.createNewClip) {
+                results.push(_.clone(resultBuffer));
+                resultBuffer = [];
             }
-
+            resultBuffer = resultBuffer.concat(context.results);
         }
+        results.push(resultBuffer);
         return results;
     }
 }
