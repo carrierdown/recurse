@@ -2,13 +2,11 @@
   {
     "start": 14.5,
     "duration": 1,
-    "pitch": 72,
-    "velocity": 127
+    "pitch": 72
   },
   {
     "start": 15.5,
     "duration": 0.5,
-    "pitch": 74,
-    "velocity": 127
+    "pitch": 74
   }
 ]]

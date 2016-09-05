@@ -1,26 +1,18 @@
 [[
   {
     "start": 0,
-    "duration": 2,
-    "pitch": 60,
-    "velocity": 127
+    "duration": 2
   },
   {
     "start": 2,
-    "duration": 4,
-    "pitch": 60,
-    "velocity": 127
+    "duration": 4
   },
   {
     "start": 6,
-    "duration": 8,
-    "pitch": 60,
-    "velocity": 127
+    "duration": 8
   },
   {
     "start": 14,
-    "duration": 2,
-    "pitch": 60,
-    "velocity": 127
+    "duration": 2
   }
 ]]

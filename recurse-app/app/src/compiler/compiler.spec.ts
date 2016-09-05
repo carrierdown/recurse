@@ -33,7 +33,8 @@ function forEachFileInDir(dirname: string, callback: (filename: string, content:
 tape('Testing compiler with valid code', (test) => {
     var compiler: Compiler = new Compiler(),
         compile: RecurseResult<NoteEvent[][]>,
-        dirname: string = path.join(__dirname, '../../../testCode/valid/');
+        dirname: string = path.join(__dirname, '../../../testCode/valid/'),
+        propertiesToTest: string[] = ['start', 'duration', 'pitch', 'velocity'];
 
     compiler.setDebug(true);
     compiler.setPreview(true);
@@ -51,10 +52,13 @@ tape('Testing compiler with valid code', (test) => {
                 let expectedResults = expectedResultsSets[i];
                 test.equal(expectedResults.length, compile.result[i].length, `Expected output length ${expectedResults.length} and actual output length ${compile.result[i].length} should be the same`);
                 for (let x = 0; x < expectedResults.length; x++) {
-                    test.equal(expectedResults[x].start, compile.result[i][x].start, `Property "start" of expected output (${expectedResults[x].start}) and actual output (${compile.result[i][x].start}) should be the same (${filename})`);
-                    test.equal(expectedResults[x].duration, compile.result[i][x].duration, `Property "duration" of expected output (${expectedResults[x].duration}) and actual output (${compile.result[i][x].duration}) should be the same (${filename})`);
-                    test.equal(expectedResults[x].pitch, compile.result[i][x].pitch, `Property "pitch" of expected output (${expectedResults[x].pitch}) and actual output (${compile.result[i][x].pitch}) should be the same (${filename})`);
-                    test.equal(expectedResults[x].velocity, compile.result[i][x].velocity, `Property "velocity" of expected output (${expectedResults[x].velocity}) and actual output (${compile.result[i][x].velocity}) should be the same (${filename})`);
+                    let expectedResult = expectedResults[x];
+                    let compiledResult = compile.result[i][x];
+                    for (let propertyToTest of propertiesToTest) {
+                        if (expectedResult[propertyToTest]) {
+                            test.equal(expectedResult[propertyToTest], compiledResult[propertyToTest], `Property ${propertyToTest} of expected output (${expectedResult[propertyToTest]}) and actual output (${compiledResult[propertyToTest]}) should be the same (${filename})`);
+                        }
+                    }
                 }
             }
         }

@@ -1,68 +1,46 @@
 [[
   {
     "start": 0,
-    "duration": 1.5,
-    "pitch": 60,
-    "velocity": 127
+    "pitch": 60
   },
   {
     "start": 1.5,
-    "duration": 1.5,
-    "pitch": 62,
-    "velocity": 127
+    "pitch": 62
   },
   {
     "start": 3,
-    "duration": 1.5,
-    "pitch": 64,
-    "velocity": 127
+    "pitch": 64
   },
   {
     "start": 4.5,
-    "duration": 1.5,
-    "pitch": 65,
-    "velocity": 127
+    "pitch": 65
   },
   {
     "start": 6,
-    "duration": 1.5,
-    "pitch": 67,
-    "velocity": 127
+    "pitch": 67
   },
   {
     "start": 7.5,
-    "duration": 1.5,
-    "pitch": 69,
-    "velocity": 127
+    "pitch": 69
   },
   {
     "start": 9,
-    "duration": 1.5,
-    "pitch": 71,
-    "velocity": 127
+    "pitch": 71
   },
   {
     "start": 10.5,
-    "duration": 1.5,
-    "pitch": 72,
-    "velocity": 127
+    "pitch": 72
   },
   {
     "start": 12,
-    "duration": 1.5,
-    "pitch": 74,
-    "velocity": 127
+    "pitch": 74
   },
   {
     "start": 13.5,
-    "duration": 1.5,
-    "pitch": 76,
-    "velocity": 127
+    "pitch": 76
   },
   {
     "start": 15,
-    "duration": 1,
-    "pitch": 77,
-    "velocity": 127
+    "pitch": 77
   }
 ]]

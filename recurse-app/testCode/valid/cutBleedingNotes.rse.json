@@ -2,37 +2,31 @@
   {
     "start": 0,
     "duration": 4,
-    "pitch": 60,
-    "velocity": 127
+    "pitch": 60
   },
   {
     "start": 4,
     "duration": 8,
-    "pitch": 60,
-    "velocity": 127
+    "pitch": 60
   },
   {
     "start": 12,
     "duration": 3.75,
-    "pitch": 60,
-    "velocity": 127
+    "pitch": 60
   },
   {
     "start": 15.75,
     "duration": 0.25,
-    "pitch": 60,
-    "velocity": 127
+    "pitch": 60
   },
   {
     "start": 4,
     "duration": 8,
-    "pitch": 72,
-    "velocity": 127
+    "pitch": 72
   },
   {
     "start": 12,
     "duration": 3.75,
-    "pitch": 72,
-    "velocity": 127
+    "pitch": 72
   }
 ]]
