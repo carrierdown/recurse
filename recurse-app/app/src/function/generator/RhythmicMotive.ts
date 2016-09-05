@@ -7,6 +7,7 @@ import RecurseObject from '../../core/type/RecurseObject';
 import {IRecurseValue} from "../../core/type/IRecurseValue";
 import Value from "../base/Value";
 import ValueType from "../../interpreter/ValueType";
+import Helpers from "../../core/util/Helpers";
 
 export default class RhythmicMotive implements INode {
     public type: Entity = Entity.RM;
@@ -44,6 +45,12 @@ export default class RhythmicMotive implements INode {
     public generate(context: IContext): Array<IRecurseValue> {
         var results: Array<IRecurseValue> = [];
         this.startOffset = context.startOffset;
+
+        Helpers.traverseNodes(this.children, (node: INode, level: number, index: number, path: number[]) => {
+            if (node.type === Entity.NESTED) {
+                console.log('path to nested is', path);
+            }
+        });
 
         // We start by doing a pre-run through all children, prior to actual generation
         // This is so that certain operators like Interpolate need to know entire length of sequence before it can generate correct output
