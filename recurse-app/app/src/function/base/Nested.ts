@@ -26,26 +26,36 @@ export default class Nested implements INode {
         // Is this node contained by an rm?
         // if so - create path to here, counting only structural nodes like nested
         let parentRm: INode = Parser.getParentNodeOfType(Entity.RM, this);
-        if (parentRm !== null) {
-            var path: number[] = [];
-/*
-            Helpers.traverseNodes(parentRm, (node: INode, level: number, index: number, path: number[]) => {
+        if (parentRm !== null && !context.prePhase) {
+            let path: number[] = [],
+                node: INode = this;
 
-            });
-*/
-            path.push(Helpers.getIndexFromParent(this));
-
-            let node: INode = this.parent;
-            while (node.parent !== parentRm) {
+            while (node.parent !== parentRm.parent) {
+                let index = Helpers.getIndexFromParent(node);
+                // todo: Maybe only accept NESTED or other constructs that create an actual hierarchy - not alt, repeat and so on
+                if (node.parent.type !== Entity.ALT && node.parent.type !== Entity.ALT_SHORTHAND) {
+                    path.unshift(index);
+                }
                 node = node.parent;
-                path.push();
-                if (node.type === Entity.NESTED) {
+            }
+            //console.log("path", path);
+            // then try matching created path to the closest match in the associated noteset (need special handling for things like alt and maybe also repeat)
+            let noteSetNode: INode = Helpers.getSiblingWithType(parentRm, Entity.NS),
+                targetNode: INode = noteSetNode;
 
+            for (let index of path) {
+/*                while (targetNode.type === Entity.ALT || targetNode.type === Entity.ALT_SHORTHAND) {
+                    let curIx = targetNode['alternationIndex'] || -1;
+                    targetNode = targetNode.children[(curIx + 1) % targetNode.children.length];
+                }*/
+                if (targetNode.children.length > 0) {
+                    targetNode = targetNode.children[index % noteSetNode.children.length];
+                } else {
+                    break;
                 }
             }
-            console.log("path", path);
+            console.log('Found target node with type', Entity[targetNode.type], 'and value', targetNode['value']);
         }
-        // then try matching created path to the closest match in the associated noteset (need special handling for things like alt and maybe also repeat)
 
         for (let child of this.children) {
             results = results.concat(child.generate(context));

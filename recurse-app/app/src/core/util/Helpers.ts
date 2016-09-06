@@ -42,4 +42,14 @@ export default class Helpers {
         }
         return -1;
     }
+
+    public static getSiblingWithType(node: INode, type: Entity): INode {
+        let parent: INode = node.parent;
+        for (let i = 0; i < parent.children.length; i++) {
+            if (parent.children[i].type === type) {
+                return parent.children[i];
+            }
+        }
+        return null;
+    }
 }
