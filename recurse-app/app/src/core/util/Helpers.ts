@@ -27,9 +27,19 @@ export default class Helpers {
         for (let i = 0; i < nodes.length; i++) {
             let newPath: number[] = _.clone(path);
             newPath.push(i);
-            console.log('Invoking callback on node ' + Entity[nodes[i].type] + ' level ' + level + ' index ' + i + ' path: ', newPath);
+            //console.log('Invoking callback on node ' + Entity[nodes[i].type] + ' level ' + level + ' index ' + i + ' path: ', newPath);
             callback(nodes[i], level, i, newPath);
             Helpers.traverseNodes(nodes[i].children, callback, level, i, newPath);
         }
+    }
+
+    public static getIndexFromParent(node: INode): number {
+        let parent: INode = node.parent;
+        for (let i = 0; i < parent.children.length; i++) {
+            if (parent.children[i] === node) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

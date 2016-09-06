@@ -5,6 +5,8 @@ import Entity from '../../interpreter/Entity';
 import IContext from '../../function/IContext';
 import {IRecurseValue} from "../../core/type/IRecurseValue";
 import ValueType from "../../interpreter/ValueType";
+import Parser from "../../interpreter/Parser";
+import Helpers from "../../core/util/Helpers";
 
 export default class Nested implements INode {
     public type: Entity = Entity.NESTED;
@@ -20,6 +22,30 @@ export default class Nested implements INode {
 
     public generate(context: IContext): Array<IRecurseValue> {
         var results: Array<IRecurseValue> = [];
+
+        // Is this node contained by an rm?
+        // if so - create path to here, counting only structural nodes like nested
+        let parentRm: INode = Parser.getParentNodeOfType(Entity.RM, this);
+        if (parentRm !== null) {
+            var path: number[] = [];
+/*
+            Helpers.traverseNodes(parentRm, (node: INode, level: number, index: number, path: number[]) => {
+
+            });
+*/
+            path.push(Helpers.getIndexFromParent(this));
+
+            let node: INode = this.parent;
+            while (node.parent !== parentRm) {
+                node = node.parent;
+                path.push();
+                if (node.type === Entity.NESTED) {
+
+                }
+            }
+            console.log("path", path);
+        }
+        // then try matching created path to the closest match in the associated noteset (need special handling for things like alt and maybe also repeat)
 
         for (let child of this.children) {
             results = results.concat(child.generate(context));

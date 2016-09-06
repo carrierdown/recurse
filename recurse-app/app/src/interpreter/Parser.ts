@@ -456,7 +456,7 @@ export default class Parser {
         return current;
     }
 
-    private static getParentNodeOfType(entity: Entity, node: INode): INode {
+    public static getParentNodeOfType(entity: Entity, node: INode): INode {
         var current: INode = null;
         if (node.type === entity) {
             return node;
