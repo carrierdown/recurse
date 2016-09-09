@@ -64,7 +64,7 @@ tape('Testing compiler with valid code', (test) => {
         }
     }, () => {
         test.end();
-    }, 'nested.rse');
+    }, 'nestedWithAlts.rse');
 });
 
 tape('Testing compiler with invalid code', (test) => {

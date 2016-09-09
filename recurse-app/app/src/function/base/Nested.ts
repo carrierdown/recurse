@@ -13,6 +13,7 @@ export default class Nested implements INode {
     public value: number;
     public children: Array<INode>;
     public parent: INode;
+    public associatedNode: INode;
 
     constructor(value: number = -1, parent: INode = null) {
         this.value = value;
@@ -44,21 +45,25 @@ export default class Nested implements INode {
                 targetNode: INode = noteSetNode;
 
             for (let index of path) {
-/*                while (targetNode.type === Entity.ALT || targetNode.type === Entity.ALT_SHORTHAND) {
+                while (targetNode.type === Entity.ALT || targetNode.type === Entity.ALT_SHORTHAND) {
                     let curIx = targetNode['alternationIndex'] || -1;
                     targetNode = targetNode.children[(curIx + 1) % targetNode.children.length];
-                }*/
+                }
                 if (targetNode.children.length > 0) {
                     targetNode = targetNode.children[index % noteSetNode.children.length];
                 } else {
                     break;
                 }
             }
-            console.log('Found target node with type', Entity[targetNode.type], 'and value', targetNode['value']);
+            //console.log('Found target node with type', Entity[targetNode.type], 'and value', targetNode['value']);
         }
 
-        for (let child of this.children) {
-            results = results.concat(child.generate(context));
+        if (this.associatedNode) {
+            results = this.associatedNode.generate(context);
+        } else {
+            for (let child of this.children) {
+                results = results.concat(child.generate(context));
+            }
         }
 
         /*
@@ -73,17 +78,19 @@ export default class Nested implements INode {
          }
         */
 
-        let sum: number = 0;
-        for (let result of results) {
-/*
-            if (_.isNaN(result.value) || result.value === null) {
-                continue;
+        if (results.length > 0 && results[0].valueType !== ValueType.NOTE && results[0].valueType !== ValueType.RAW_NOTE) {
+            let sum: number = 0;
+            for (let result of results) {
+                /*
+                 if (_.isNaN(result.value) || result.value === null) {
+                 continue;
+                 }
+                 */
+                sum += result.value;
             }
-*/
-            sum += result.value;
-        }
-        for (let i = 0; i < results.length; i++) {
-            results[i].value = (results[i].value / sum) * this.value;
+            for (let i = 0; i < results.length; i++) {
+                results[i].value = (results[i].value / sum) * this.value;
+            }
         }
         return results;
     }

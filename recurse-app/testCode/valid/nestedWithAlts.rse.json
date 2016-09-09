@@ -1,0 +1,40 @@
+[
+  [
+    {
+      "start": 0,
+      "pitch": 60
+    },
+    {
+      "start": 8,
+      "pitch": 72
+    },
+    {
+      "start": 10,
+      "pitch": 74
+    },
+    {
+      "start": 12,
+      "pitch": 72
+    },
+    {
+      "start": 16,
+      "pitch": 60
+    },
+    {
+      "start": 20,
+      "pitch": 60
+    },
+    {
+      "start": 24,
+      "pitch": 74
+    },
+    {
+      "start": 28,
+      "pitch": 74
+    },
+    {
+      "start": 30,
+      "pitch": 74
+    }
+  ]
+]
