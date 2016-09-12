@@ -33,37 +33,37 @@ export default class Nested implements INode {
 
             while (node.parent !== parentRm.parent) {
                 let index = Helpers.getIndexFromParent(node);
-                // todo: Maybe only accept NESTED or other constructs that create an actual hierarchy - not alt, repeat and so on
-                if (node.parent.type !== Entity.ALT && node.parent.type !== Entity.ALT_SHORTHAND) {
+                if (node.parent.type !== Entity.ALT && node.parent.type !== Entity.ALT_SHORTHAND && node.parent.type !== Entity.REPEAT && node.parent.type !== Entity.REPEAT_SHORTHAND) {
+                    //console.log('adding', index, 'node parent', Entity[node.parent.type]);
                     path.unshift(index);
                 }
                 node = node.parent;
             }
-            //console.log("path", path);
+            console.log("path", path);
             // then try matching created path to the closest match in the associated noteset (need special handling for things like alt and maybe also repeat)
-            let noteSetNode: INode = Helpers.getSiblingWithType(parentRm, Entity.NS),
-                targetNode: INode = noteSetNode;
+            let targetNode: INode = Helpers.getSiblingWithType(parentRm, Entity.NS);
 
             for (let index of path) {
-                while (targetNode.type === Entity.ALT || targetNode.type === Entity.ALT_SHORTHAND) {
-                    let curIx = targetNode['alternationIndex'] || -1;
-                    targetNode = targetNode.children[(curIx + 1) % targetNode.children.length];
-                }
                 if (targetNode.children.length > 0) {
-                    targetNode = targetNode.children[index % noteSetNode.children.length];
+                    targetNode = targetNode.children[index % targetNode.children.length];
+                    //console.log('while', targetNode.type);
+                    while ((targetNode.type === Entity.ALT || targetNode.type === Entity.ALT_SHORTHAND) && targetNode.children.length > 0) {
+                        let curIx = targetNode['alternationIndex'] || -1;
+                        targetNode = targetNode.children[(curIx + 1) % targetNode.children.length];
+                    }
                 } else {
                     break;
                 }
             }
-            //console.log('Found target node with type', Entity[targetNode.type], 'and value', targetNode['value']);
+            this.associatedNode = targetNode;
+            console.log('Found target node with type', Entity[targetNode.type], 'and value', targetNode['value']);
+            if (targetNode.type === Entity.NESTED) {
+                console.log('with first sub value', targetNode.children[0]['value']);
+            }
         }
 
-        if (this.associatedNode) {
-            results = this.associatedNode.generate(context);
-        } else {
-            for (let child of this.children) {
-                results = results.concat(child.generate(context));
-            }
+        for (let child of this.children) {
+            results = results.concat(child.generate(context));
         }
 
         /*
@@ -88,10 +88,33 @@ export default class Nested implements INode {
                  */
                 sum += result.value;
             }
+
             for (let i = 0; i < results.length; i++) {
                 results[i].value = (results[i].value / sum) * this.value;
             }
+
+            if (this.associatedNode) {
+                let noteResults: IRecurseValue[] = [],
+                    i: number = 0;
+                for (let result of results) {
+                    if (i >= noteResults.length) {
+                        noteResults = this.associatedNode.generate(context);
+                        i = 0;
+                    }
+                    if (!result.additionalValues) {
+                        result.additionalValues = [];
+                    }
+                    if (result.additionalValues.length === 0) {
+                        result.additionalValues.push({value: noteResults[i].value, valueType: ValueType.NOTE});
+                    }
+                    i++;
+                }
+                if (this.associatedNode.reset) {
+                    this.associatedNode.reset();
+                }
+            }
         }
+
         return results;
     }
 }

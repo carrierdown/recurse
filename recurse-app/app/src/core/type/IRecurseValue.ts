@@ -5,4 +5,5 @@ export interface IRecurseValue {
     value: number;
     valueType: ValueType;
     refToTargetNode?: INode;
+    additionalValues?: {value: number, valueType: ValueType}[];
 }

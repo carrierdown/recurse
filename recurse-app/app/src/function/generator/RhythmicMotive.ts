@@ -46,11 +46,11 @@ export default class RhythmicMotive implements INode {
         var results: Array<IRecurseValue> = [];
         this.startOffset = context.startOffset;
 
-        Helpers.traverseNodes(this.children, (node: INode, level: number, index: number, path: number[]) => {
+/*        Helpers.traverseNodes(this.children, (node: INode, level: number, index: number, path: number[]) => {
             if (node.type === Entity.NESTED) {
                 console.log('path to nested is', path);
             }
-        });
+        });*/
 
         // We start by doing a pre-run through all children, prior to actual generation
         // This is so that certain operators like Interpolate need to know entire length of sequence before it can generate correct output
@@ -116,6 +116,22 @@ export default class RhythmicMotive implements INode {
                 }
                 this.currentPosition += result.value;
                 let ro = RecurseObject.getInstanceFromIntervalWithRests(result.value, preRest, 0);
+                if (result.additionalValues && result.additionalValues.length > 0) {
+                    for (let additionalValue of result.additionalValues) {
+                        // todo: support velocities as well here
+                        if (additionalValue.valueType === ValueType.NOTE || additionalValue.valueType == ValueType.RAW_NOTE) {
+                            if (ro.pitches.length === 0) {
+                                ro.pitches.push(additionalValue.value);
+                            }
+                        }
+                    }
+                }
+/*
+                if (result.refToTargetNode) {
+                    let noteResults = result.refToTargetNode.generate()
+                    ro.pitches
+                }
+*/
                 ro.refToGenNode = this;
                 context.results.push(ro);
                 if (preRest > 0) {

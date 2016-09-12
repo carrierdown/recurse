@@ -23,8 +23,8 @@ export default class NoteSet implements INode {
         for (let result of context.results) {
             if (result.pitches.length === 0) {
                 result.pitches.push(results[i % results.length].value);
-                i++;
             }
+            i++;
         }
         return [];
     }
