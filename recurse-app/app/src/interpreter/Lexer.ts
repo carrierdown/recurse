@@ -173,16 +173,23 @@ export default class Lexer {
 
     private processNumber(): IToken {
         var endpos = this.position + 1;
-        while (endpos < this.bufferLength &&
-        Lexer.isDigit(this.buffer.charAt(endpos))) {
+        while (endpos < this.bufferLength && (Lexer.isDigit(this.buffer.charAt(endpos))
+               || (this.buffer.charAt(endpos) === '.') && (this.buffer.charAt(endpos + 1) !== '.') )) // avoid parsing shorthand ranges as numbers, e.g. 1..4
+        {
             endpos++;
         }
 
-        var token = {
+        var token: IToken = {
             type: TokenType.NUMBER,
             value: this.buffer.substring(this.position, endpos),
             pos: this.position
         };
+        token.value = parseFloat(token.value);
+        if (isNaN(token.value)) {
+            // invalid number, throw error. fix this when rewriting lexer
+            console.log('WARN: Lexer detected invalid number', token.value);
+        }
+
         this.position = endpos;
         return token;
     }

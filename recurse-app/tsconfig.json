@@ -57,6 +57,7 @@
         "app/src/interpreter/ISetting.ts",
         "app/src/interpreter/ISyntaxTree.ts",
         "app/src/interpreter/IToken.ts",
+        "app/src/interpreter/Lexer.spec.ts",
         "app/src/interpreter/Lexer.ts",
         "app/src/interpreter/Parser.ts",
         "app/src/interpreter/TokenType.ts",
