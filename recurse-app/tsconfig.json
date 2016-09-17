@@ -26,6 +26,8 @@
         "app/src/core/type/RecurseStatus.ts",
         "app/src/core/type/Scale.ts",
         "app/src/core/util/Helpers.ts",
+        "app/src/core/util/convertNoteListToRecurseCode.spec.ts",
+        "app/src/core/util/convertNoteListToRecurseCode.ts",
         "app/src/core/util/createLookupTable.ts",
         "app/src/core/util/forEachPitch.ts",
         "app/src/core/util/forEachSelectedPitch.ts",
