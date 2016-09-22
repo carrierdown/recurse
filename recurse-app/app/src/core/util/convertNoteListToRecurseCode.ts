@@ -14,7 +14,7 @@ interface IResult {
     notes: number[];
 }
 
-export function convertNoteListToRecurseCode(noteList: INote[]): string {
+export function convertNoteListToRecurseCode(noteList: INote[], clipLength: number = 4): string {
     var results: IResult[] = [{intervals: [], notes: []}],
         currentResultIndex: number = 0,
         currentStartPos: number,
@@ -48,20 +48,48 @@ export function convertNoteListToRecurseCode(noteList: INote[]): string {
 
     for (let r: number = 0; r < results.length; r++) {
         let result = results[r];
+        let totalLength = clipLength * 4;
 
-        output += "rm(";
+        if (totalLength !== 16) {
+            output += `length(${totalLength}) `;
+        }
+
+        let rmOutput = "";
         for (let i: number = 0; i < result.intervals.length; i++) {
             let interval = result.intervals[i];
-            output += (interval > 0 ? interval : "_" + Math.abs(interval)) + (i < result.intervals.length - 1 ? "," : "");
+            if (interval > 0) {
+                rmOutput += interval;
+            } else {
+                interval = Math.abs(interval);
+                rmOutput += `_${interval}`;
+            }
+            totalLength -= interval;
+            if (i < result.intervals.length - 1) {
+                rmOutput += ",";
+            }
         }
-        output += ") ";
+        if (totalLength > 0) {
+            rmOutput += `,_${totalLength}`;
+        }
+        output += `rm(${rmOutput}) `;
 
-        output += "ns(";
+        let noteOutput = "";
+        let noteValueStatic: number = -1; // if >= 0, note value is unchanged throughout the sequence and can be included only once in output. Otherwise note value changes and should be included as is.
         for (let i: number = 0; i < result.notes.length; i++) {
-            let note = result.notes[i];
-            output += Note.noteNames[note].toLowerCase() + (i < result.notes.length - 1 ? "," : "");
+            let note: number = result.notes[i];
+            if (noteValueStatic !== note) {
+                if (noteValueStatic === -1) {
+                    noteValueStatic = note;
+                } else {
+                    noteValueStatic = -2;
+                }
+            }
+            noteOutput += Note.noteNames[note].toLowerCase() + (i < result.notes.length - 1 ? "," : "");
         }
-        output += ")" + (r < results.length - 1 ? "; " : "");
+        if (noteValueStatic >= 0) {
+            noteOutput = Note.noteNames[noteValueStatic].toLowerCase();
+        }
+        output += `ns(${noteOutput})${(r < results.length - 1 ? "; " : "")}`;
     }
 
     return output;

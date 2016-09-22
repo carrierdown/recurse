@@ -31,10 +31,10 @@ Clip.prototype.getSelectedNotes = function() {
 
 
 Clip.prototype.getNotes = function(startTime, timeRange, startPitch, pitchRange) {
-    if(!startTime) startTime = 0;
-    if(!timeRange) timeRange = this.getLength();
-    if(!startPitch) startPitch = 0;
-    if(!pitchRange) pitchRange = 128;
+    startTime = startTime || 0;
+    timeRange = timeRange || this.getLength();
+    startPitch = startPitch || 0;
+    pitchRange = pitchRange || 128;
 
     var data = this.liveObject.call("get_notes", startTime, startPitch, timeRange, pitchRange);
     return this._parseNoteData(data);
@@ -81,6 +81,9 @@ function Note(pitch, start, duration, velocity, muted) {
     this.muted = muted;
 }
 
+Note.NOTE_NAMES = ['C-2', 'C#-2', 'D-2', 'D#-2', 'E-2', 'F-2', 'F#-2', 'G-2', 'G#-2', 'A-2', 'A#-2', 'B-2', 'C-1', 'C#-1', 'D-1', 'D#-1', 'E-1', 'F-1', 'F#-1', 'G-1', 'G#-1', 'A-1', 'A#-1', 'B-1', 'C0', 'C#0', 'D0', 'D#0', 'E0', 'F0', 'F#0', 'G0', 'G#0', 'A0', 'A#0', 'B0', 'C1', 'C#1', 'D1', 'D#1', 'E1', 'F1', 'F#1', 'G1', 'G#1', 'A1', 'A#1', 'B1', 'C2', 'C#2', 'D2', 'D#2', 'E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2', 'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3', 'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5', 'F#5', 'G5', 'G#5', 'A5', 'A#5', 'B5', 'C6', 'C#6', 'D6', 'D#6', 'E6', 'F6', 'F#6', 'G6', 'G#6', 'A6', 'A#6', 'B6', 'C7', 'C#7', 'D7', 'D#7', 'E7', 'F7', 'F#7', 'G7', 'G#7', 'A7', 'A#7', 'B7', 'C8', 'C#8', 'D8', 'D#8', 'E8', 'F8', 'F#8', 'G8'];
+Note.MIN_DURATION = 1/128;
+
 Note.prototype.toString = function() {
     return '{pitch:' + this.pitch +
         ', start:' + this.start +
@@ -88,8 +91,6 @@ Note.prototype.toString = function() {
         ', velocity:' + this.velocity +
         ', muted:' + this.muted + '}';
 };
-
-Note.MIN_DURATION = 1/128;
 
 Note.prototype.getPitch = function() {
     if(this.pitch < 0) return 0;
@@ -139,9 +140,61 @@ function set_json(jsonString) {
     clip.replaceAllNotes(notes);
 }
 
-// temp - just for testing
+// gets intervals from currently selected clips and converts them to recurse code, then sends resulting code as OSC message to /recurse/intervals
 function get_intervals() {
-    outlet(1, ['/recurse/intervals', '2,4,6,8']);
+    var clip = new Clip(),
+        noteList = clip.getNotes(),
+        results = [{
+            intervals: [],
+            notes: []
+        }],
+        currentResultIndex = 0,
+        currentStartPos,
+        currentEndPos,
+        backlog,
+        output = "";
+
+    do {
+        backlog = [];
+        currentEndPos = currentStartPos = 0;
+        for (var _i = 0, noteList_1 = noteList; _i < noteList_1.length; _i++) {
+            var note = noteList_1[_i];
+            if (!results[currentResultIndex]) {
+                results[currentResultIndex] = {intervals: [], notes: []};
+            }
+            var currentResults = results[currentResultIndex];
+            if (currentEndPos <= note.start) {
+                if (currentEndPos < note.start) {
+                    currentResults.intervals.push(0 - ((note.start - currentEndPos) * 4));
+                }
+                currentResults.intervals.push(note.duration * 4);
+                currentResults.notes.push(note.pitch);
+                currentStartPos = note.start;
+                currentEndPos = note.start + note.duration;
+            }
+            else {
+                backlog.push(note);
+            }
+        }
+        noteList = backlog;
+        currentResultIndex++;
+    } while (backlog.length !== 0);
+    for (var r = 0; r < results.length; r++) {
+        var result = results[r];
+        output += "rm(";
+        for (var i = 0; i < result.intervals.length; i++) {
+            var interval = result.intervals[i];
+            output += (interval > 0 ? interval : "_" + Math.abs(interval)) + (i < result.intervals.length - 1 ? "," : "");
+        }
+        output += ") ";
+        output += "ns(";
+        for (var i = 0; i < result.notes.length; i++) {
+            var note = result.notes[i];
+            output += Note.NOTE_NAMES[note].toLowerCase() + (i < result.notes.length - 1 ? "," : "");
+        }
+        output += ")" + (r < results.length - 1 ? "; " : "");
+    }
+    outlet(1, ['/recurse/intervals', output]);
 }
 
 // dummy function for testing creation of multiple clips in the currently selected track, starting at clip 0
