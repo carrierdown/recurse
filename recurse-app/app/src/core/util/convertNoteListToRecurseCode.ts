@@ -14,6 +14,7 @@ interface IResult {
     notes: number[];
 }
 
+// Note: This code could be split up a bit more, but I'm keeping everything in one function here since it's targeted as a single function in a M4L patch
 export function convertNoteListToRecurseCode(noteList: INote[], clipLength: number = 4): string {
     var results: IResult[] = [{intervals: [], notes: []}],
         currentResultIndex: number = 0,
@@ -21,6 +22,16 @@ export function convertNoteListToRecurseCode(noteList: INote[], clipLength: numb
         currentEndPos: number,
         backlog: INote[],
         output: string = "";
+
+    noteList.sort((a: INote, b: INote): number => {
+        if (a.start > b.start) {
+            return 1;
+        }
+        if (a.start < b.start) {
+            return -1;
+        }
+        return 0;
+    });
 
     do {
         backlog = [];

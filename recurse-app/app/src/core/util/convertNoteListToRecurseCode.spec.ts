@@ -43,13 +43,6 @@ tape('convert overlapping notes to separate recurse declarations', (test) => {
 tape('convert straight-forward sequence of notes to one recurse declaration', (test) => {
     var testInput: {start: number, duration: number, pitch: number, velocity: number, muted: number}[] = [
             {
-                start: 0,
-                duration: .25,
-                pitch: 65,
-                velocity: 127,
-                muted: 0
-            },
-            {
                 start: .5,
                 duration: .25,
                 pitch: 62,
@@ -60,6 +53,13 @@ tape('convert straight-forward sequence of notes to one recurse declaration', (t
                 start: 1,
                 duration:.25,
                 pitch: 64,
+                velocity: 127,
+                muted: 0
+            },
+            {
+                start: 0,
+                duration: .25,
+                pitch: 65,
                 velocity: 127,
                 muted: 0
             },

@@ -142,25 +142,26 @@ function set_json(jsonString) {
 
 // gets intervals from currently selected clips and converts them to recurse code, then sends resulting code as OSC message to /recurse/intervals
 function get_intervals() {
-    var clip = new Clip(),
-        noteList = clip.getNotes(),
-        results = [{
-            intervals: [],
-            notes: []
-        }],
-        currentResultIndex = 0,
-        currentStartPos,
-        currentEndPos,
-        backlog,
-        output = "";
-
+    var clipLength = 4,
+        clip = new Clip(),
+        noteList = clip.getNotes();
+    var results = [{ intervals: [], notes: [] }], currentResultIndex = 0, currentStartPos, currentEndPos, backlog, output = "";
+    noteList.sort(function (a, b) {
+        if (a.start > b.start) {
+            return 1;
+        }
+        if (a.start < b.start) {
+            return -1;
+        }
+        return 0;
+    });
     do {
         backlog = [];
         currentEndPos = currentStartPos = 0;
         for (var _i = 0, noteList_1 = noteList; _i < noteList_1.length; _i++) {
             var note = noteList_1[_i];
             if (!results[currentResultIndex]) {
-                results[currentResultIndex] = {intervals: [], notes: []};
+                results[currentResultIndex] = { intervals: [], notes: [] };
             }
             var currentResults = results[currentResultIndex];
             if (currentEndPos <= note.start) {
@@ -181,18 +182,47 @@ function get_intervals() {
     } while (backlog.length !== 0);
     for (var r = 0; r < results.length; r++) {
         var result = results[r];
-        output += "rm(";
+        var totalLength = clipLength * 4;
+        if (totalLength !== 16) {
+            output += "length(" + totalLength + ") ";
+        }
+        var rmOutput = "";
         for (var i = 0; i < result.intervals.length; i++) {
             var interval = result.intervals[i];
-            output += (interval > 0 ? interval : "_" + Math.abs(interval)) + (i < result.intervals.length - 1 ? "," : "");
+            if (interval > 0) {
+                rmOutput += interval;
+            }
+            else {
+                interval = Math.abs(interval);
+                rmOutput += "_" + interval;
+            }
+            totalLength -= interval;
+            if (i < result.intervals.length - 1) {
+                rmOutput += ",";
+            }
         }
-        output += ") ";
-        output += "ns(";
+        if (totalLength > 0) {
+            rmOutput += ",_" + totalLength;
+        }
+        output += "rm(" + rmOutput + ") ";
+        var noteOutput = "";
+        var noteValueStatic = -1;
         for (var i = 0; i < result.notes.length; i++) {
             var note = result.notes[i];
-            output += Note.NOTE_NAMES[note].toLowerCase() + (i < result.notes.length - 1 ? "," : "");
+            if (noteValueStatic !== note) {
+                if (noteValueStatic === -1) {
+                    noteValueStatic = note;
+                }
+                else {
+                    noteValueStatic = -2;
+                }
+            }
+            noteOutput += Note.NOTE_NAMES[note].toLowerCase() + (i < result.notes.length - 1 ? "," : "");
         }
-        output += ")" + (r < results.length - 1 ? "; " : "");
+        if (noteValueStatic >= 0) {
+            noteOutput = Note.NOTE_NAMES[noteValueStatic].toLowerCase();
+        }
+        output += "ns(" + noteOutput + ")" + (r < results.length - 1 ? "; " : "");
     }
     outlet(1, ['/recurse/intervals', output]);
 }
