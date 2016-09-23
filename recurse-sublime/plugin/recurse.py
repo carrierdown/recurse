@@ -35,3 +35,5 @@ class RecurseCommand(sublime_plugin.TextCommand):
 
 		for pos in self.view.sel():
 			self.view.insert(edit, pos.begin(), a.value)
+
+		a.value = "";
