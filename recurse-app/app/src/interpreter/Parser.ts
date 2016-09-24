@@ -33,6 +33,7 @@ import SetScale from "../function/setter/SetScale";
 import Loop from "../function/setter/Loop";
 import Pitch from "../function/modifier/Pitch";
 import Range from "../function/operator/Range";
+import VelocitySet from "../function/generator/VelocitySet";
 
 export default class Parser {
     public static get SHORTHAND_TOKENS(): Array<TokenType> {
@@ -109,6 +110,8 @@ export default class Parser {
             case Entity.SELECT: return new Select(parent, SelectStrategy.indexList);
             case Entity.SELECT_INDEX: return new Value(value, parent, ValueType.SELECT_INDEX);
             case Entity.TRANSPOSE: return new Transpose(parent, children);
+            case Entity.VEL: return new VelocitySet(parent, children);
+            case Entity.VELOCITY: return new Value(value, parent, ValueType.VELOCITY);
             default:
                 console.log('Parser.createNode: Entity not matching available node type', Entity[type]);
         }
@@ -131,7 +134,7 @@ export default class Parser {
             case 'last':
                 return Entity.LAST;
             case 'ns':
-            case 'noteSet':
+            case 'noteset':
             case 'notes':
                 return Entity.NS;
             case 'odd':
@@ -164,6 +167,11 @@ export default class Parser {
             case 'tr':
             case 'transpose':
                 return Entity.TRANSPOSE;
+            case 'velocities':
+            case 'velocityset':
+            case 'vel':
+            case 'vs':
+                return Entity.VEL;
             default:
                 console.log('couldn\'t find identifier...');
         }
@@ -216,21 +224,6 @@ export default class Parser {
                     TokenType[tokenSet[i].type]
                 ));
             }
-
-            // transform notes to numbers while retaining note info for use later if needed
-            // currently this info is discarded at node creation
-            // prolly redo this logic a bit, using INumber > Note, Interval, Pitch etc
-/*
-            if (tokenSet[i].type === TokenType.NOTE) {
-                tokenSet[i].originalValue = tokenSet[i].value;
-                tokenSet[i].originalType = tokenSet[i].type;
-                tokenSet[i].value = Note.pitchFromNoteName(tokenSet[i].value);
-                tokenSet[i].type = TokenType.NUMBER;
-            }
-*/
-
-            // todo: use allowedOn and notAllowedOn maps to enforce which functions can be called where (i.e. rm(n,alt(n,n)) is allowed while alt(n,rm(n,n)) is not)
-            // todo: Some operator like # or ; creates a new track. Implement by creating new root node and moving current to point to it.
 
             let entityType;
 
@@ -320,11 +313,6 @@ export default class Parser {
                     // todo: check that we dont add multiple FILL entities to one parent
                     current.children.push(Parser.createNode(Entity.FILL, current));
                     break;
-/*
-                case TokenType.NOTE:
-                    current.children.push(Parser.createNode(Entity.NOTE, current, tokenSet[i].value));
-                    break;
-*/
                 case TokenType.LEFT_PAREN:
                     // if we just created e.g. an rm, we are currently on the parent of rm (typically root or chain)
                     // when the l_paren is encountered we want to change current to point to our newly created item, in this case rm
@@ -341,13 +329,6 @@ export default class Parser {
                     //console.log('l_paren', current, current.parent);
                     break;
                 case TokenType.RIGHT_PAREN:
-                    //console.log('r_paren', current, current.parent);
-/*
-                    if (current.type === Entity.CHAIN && nextToken.type !== TokenType.PIPE) {
-                        // if we're currently in a chain node and the next expression isn't chained, move one step up
-                        current = current.parent;
-                    }
-*/
                     current = Parser.exitShorthandStatements(current);
                     // no children on current node is not necessarily an error (could be an empty func())
                     current = current.parent;
@@ -379,15 +360,6 @@ export default class Parser {
                     syntaxTree.rootNodes.push(newClipRoot);
                     current = Parser.addNodeToChildrenAndRetrieve(newClipRoot, Entity.CHAIN);
                     break;
-/*
-                case TokenType.PIPE:
-                    if (current.type !== Entity.CHAIN) {
-                        return result.setError(ErrorMessages.getError(ErrorMessages.NOT_IN_CHAIN));
-                    }
-                    current.parent.children.push(Parser.createNode(Entity.CHAIN, current.parent));
-                    current = current.parent.children[current.parent.children.length - 1];
-                    break;
-*/
                 case TokenType.IDENTIFIER:
                     let entity = Parser.recurseEntityFromIdentifier(tokenSet[i].value);
                     if (entity === Entity.INVALID) {
@@ -430,6 +402,8 @@ export default class Parser {
                 return Entity.INTERVAL;
             case Entity.NS:
                 return Entity.RAW_NOTE;
+            case Entity.VEL:
+                return Entity.VELOCITY;
             case Entity.TRANSPOSE:
             case Entity.PITCH:
                 return Entity.PITCH_OFFSET;
@@ -522,8 +496,7 @@ export default class Parser {
 
         output += `
             ${_.repeat(' ', level)}- type:      ${Entity[node.type]}
-            ${_.repeat(' ', level)}  value:     ${value || ''}
-            ${_.repeat(' ', level)}  parent:    ${parent}`;
+            ${_.repeat(' ', level)}  value:     ${value || ''}`;
 
         if (node['valueType']) {
             output += `

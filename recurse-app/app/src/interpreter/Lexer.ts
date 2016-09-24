@@ -1,9 +1,8 @@
 import IToken from './IToken';
 import { TokenType } from "./TokenType";
 
-// todo: should rewrite from scratch to make it all K(tm)
-// also, should have support for floating numbers and should parse the correct value right away so that Parser doesn't need to care about that type of thing
-// also, should differentiate between keywords (maybe with separate classes for functions, scales, and so on) and identifiers (or maybe scales belong here, together with variables and so on)
+// todo: should rewrite from scratch
+// should probably differentiate between keywords (maybe with separate classes for functions, scales, and so on) and identifiers (or maybe scales belong here, together with variables and so on)
 
 export default class Lexer {
     private position: number = 0;

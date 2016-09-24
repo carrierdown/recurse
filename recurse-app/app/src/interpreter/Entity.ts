@@ -35,7 +35,9 @@ enum Entity {
     SELECT_INDEX,
     SET_SCALE,
     TRANSPOSE,
-    VALUE
+    VALUE,
+    VEL,
+    VELOCITY
 }
 
 export default Entity;

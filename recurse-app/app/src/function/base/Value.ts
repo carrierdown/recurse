@@ -3,6 +3,7 @@ import ValueType from '../../interpreter/ValueType';
 import IContext from '../../function/IContext';
 import Entity from "../../interpreter/Entity";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
+import Helpers from "../../core/util/Helpers";
 
 // todo: create Interval, Note, PitchOffset and so on.. Interval needs to take into account current res for instance, and
 // recalc to keep a consistent res of 1/16 for instance. This is important due to other params like patternLength using this reso.
@@ -26,6 +27,10 @@ export default class Value implements INode {
         // todo: do any transforms needed here, based on type: INTERVAL, NOTE, REST, etc.. Interval needs to take into account current res for instance, and
         // recalc to keep a consistent res of 1/16 for instance. This is important due to other params like patternLength using this reso.
         let value = this.value;
+
+        if (this.valueType === ValueType.VELOCITY) {
+            value = Helpers.ensureRange(value, 0, 127);
+        }
 /*
         if (this.valueType === ValueType.SCALE_DEGREE) {
             console.log(`Turned ${value} into ${context.scale.scaleDegreeToNote(this.value, context.rootOct)}`);

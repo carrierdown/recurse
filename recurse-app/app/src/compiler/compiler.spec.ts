@@ -64,7 +64,7 @@ tape('Testing compiler with valid code', (test) => {
         }
     }, () => {
         test.end();
-    }/*, 'nestedSimple.rse'*/);
+    }/*, 'vel.rse'*/);
 });
 
 tape('Testing compiler with invalid code', (test) => {

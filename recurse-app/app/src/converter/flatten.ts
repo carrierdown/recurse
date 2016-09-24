@@ -3,6 +3,7 @@ import _ = require('lodash');
 import RecurseObject from "../core/type/RecurseObject";
 import NoteEvent from "../core/type/NoteEvent";
 import INode from "../interpreter/INode";
+import {Constants} from "../core/type/Constants";
 
 // "flattens" sequence for consumption by a typical sequencer. Flattening makes intervals relative to zero rather than the preceding note event
 export default function flatten(itemsSets: Array<Array<RecurseObject>>): Array<Array<NoteEvent>> {
@@ -24,7 +25,7 @@ export default function flatten(itemsSets: Array<Array<RecurseObject>>): Array<A
             currentPos = _.round(currentPos + getQuarterNoteValue(item.preRest), 3);
             let interval = getQuarterNoteValue(item.interval);
             for (let pitch of item.pitches) {
-                flattenedResults.push(new NoteEvent(currentPos, interval, pitch, item.velocity));
+                flattenedResults.push(new NoteEvent(currentPos, interval, pitch, item.velocity || Constants.DEFAULT_VELOCITY));
             }
             currentPos += interval + getQuarterNoteValue(item.postRest);
         }

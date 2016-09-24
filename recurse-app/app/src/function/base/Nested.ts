@@ -11,18 +11,19 @@ import Helpers from "../../core/util/Helpers";
 export default class Nested implements INode {
     public type: Entity = Entity.NESTED;
     public value: number;
-    public children: Array<INode>;
+    public children: INode[];
     public parent: INode;
-    public associatedNode: INode;
+    public associatedNodes: INode[];
 
     constructor(value: number = -1, parent: INode = null) {
         this.value = value;
         this.parent = parent;
         this.children = [];
+        this.associatedNodes = [];
     }
 
     public generate(context: IContext): Array<IRecurseValue> {
-        var results: Array<IRecurseValue> = [];
+        var results: IRecurseValue[] = [];
 
         // Is this node contained by an rm?
         // if so - create path to here, counting only structural nodes like nested
@@ -39,27 +40,16 @@ export default class Nested implements INode {
                 }
                 node = node.parent;
             }
-            console.log("path", path);
-            // then try matching created path to the closest match in the associated noteset (need special handling for things like alt and maybe also repeat)
-            let targetNode: INode = Helpers.getSiblingWithType(parentRm, Entity.NS);
+            //console.log("path", path);
+            // then try matching created path to the closest match in the associated notes and velocities (need special handling for things like alt and maybe also repeat)
 
-            for (let index of path) {
-                if (targetNode.children.length > 0) {
-                    targetNode = targetNode.children[index % targetNode.children.length];
-                    //console.log('while', targetNode.type);
-                    while ((targetNode.type === Entity.ALT || targetNode.type === Entity.ALT_SHORTHAND) && targetNode.children.length > 0) {
-                        let curIx = targetNode['alternationIndex'] || -1;
-                        targetNode = targetNode.children[(curIx + 1) % targetNode.children.length];
-                    }
-                } else {
-                    break;
-                }
-            }
-            this.associatedNode = targetNode;
-            console.log('Found target node with type', Entity[targetNode.type], 'and value', targetNode['value']);
-            if (targetNode.type === Entity.NESTED) {
-                console.log('with first sub value', targetNode.children[0]['value']);
-            }
+            this.addAssociatedNodeOfType(Entity.NS, parentRm, path);
+            //this.addAssociatedNodeOfType(Entity.VEL, parentRm, path);
+
+            //console.log('Found target node with type', Entity[targetNode.type], 'and value', targetNode['value']);
+            //if (targetNode.type === Entity.NESTED) {
+            //    console.log('with first sub value', targetNode.children[0]['value']);
+            //}
         }
 
         for (let child of this.children) {
@@ -93,28 +83,48 @@ export default class Nested implements INode {
                 results[i].value = (results[i].value / sum) * this.value;
             }
 
-            if (this.associatedNode) {
-                let noteResults: IRecurseValue[] = [],
+            for (let associatedNode of this.associatedNodes) {
+                let associatedResults: IRecurseValue[] = [],
                     i: number = 0;
                 for (let result of results) {
-                    if (i >= noteResults.length) {
-                        noteResults = this.associatedNode.generate(context);
+                    if (i >= associatedResults.length) {
+                        associatedResults = associatedNode.generate(context);
                         i = 0;
                     }
                     if (!result.additionalValues) {
                         result.additionalValues = [];
                     }
                     if (result.additionalValues.length === 0) {
-                        result.additionalValues.push({value: noteResults[i].value, valueType: ValueType.NOTE});
+                        result.additionalValues.push({value: associatedResults[i].value, valueType: associatedResults[i].valueType});
                     }
                     i++;
                 }
-                if (this.associatedNode.reset) {
-                    this.associatedNode.reset();
+                if (associatedNode.reset) {
+                    associatedNode.reset();
                 }
             }
         }
 
         return results;
+    }
+
+    private addAssociatedNodeOfType(entity: Entity, parent: INode, path: number[]): void {
+        let targetNode: INode = Helpers.getSiblingWithType(parent, entity);
+
+        for (let index of path) {
+            if (targetNode.children.length > 0) {
+                targetNode = targetNode.children[index % targetNode.children.length];
+                //console.log('while', targetNode.type);
+                while ((targetNode.type === Entity.ALT || targetNode.type === Entity.ALT_SHORTHAND) && targetNode.children.length > 0) {
+                    let curIx = targetNode['alternationIndex'] || -1;
+                    targetNode = targetNode.children[(curIx + 1) % targetNode.children.length];
+                }
+            } else {
+                break;
+            }
+        }
+        if (this.associatedNodes.indexOf(targetNode) < 0) {
+            this.associatedNodes.push(targetNode);
+        }
     }
 }

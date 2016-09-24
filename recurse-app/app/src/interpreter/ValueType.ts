@@ -5,7 +5,8 @@ enum ValueType {
     PITCH_OFFSET,
     RAW_NOTE, // MIDI pitch numbers 0-127
     REST,
-    SELECT_INDEX
+    SELECT_INDEX,
+    VELOCITY
 }
 
 export default ValueType;

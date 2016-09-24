@@ -53,7 +53,8 @@ tape('return tokenized version of input', (test) => {
         i: number = 0;
     lexer.setBuffer(input);
     while (token = lexer.token()) {
-        test.equal(token.type, expectedTokens[i++], `${TokenType[token.type]} should equal ${TokenType[expectedTokens[i]]}`);
+        test.equal(token.type, expectedTokens[i], `Token with value ${token.value} should translate to ${TokenType[expectedTokens[i]]}`);
+        i++;
     }
     test.end();
 });
@@ -81,7 +82,8 @@ tape('handle decimal numbers properly', (test) => {
         i: number = 0;
     lexer.setBuffer(input);
     while (token = lexer.token()) {
-        test.equal(token.type, expectedTokens[i++], `${TokenType[token.type]} should equal ${TokenType[expectedTokens[i]]}`);
+        test.equal(token.type, expectedTokens[i], `Token with value ${token.value} should translate to ${TokenType[expectedTokens[i]]}`);
+        i++;
     }
     test.end();
 });

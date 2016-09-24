@@ -1,7 +1,7 @@
 import INode from "../../interpreter/INode";
 export default class RecurseObject {
     public interval: number;
-    public pitches: Array<number>;
+    public pitches: number[];
     public order: number;
     public velocity: number; // might be useful to have multiple velos for e.g. chords
     public duration: number;
@@ -9,10 +9,8 @@ export default class RecurseObject {
     public preRest: number;
     public refToGenNode: INode;
     public level: number; // todo: to be implemented - needed for e.g. selecting on levels, i.e. select level 2 for nested intervals only.
-    //public morphs: {interval:0, velocity:0};
 
-
-    constructor(interval: number = 0, pitches: Array<number> = [], order: number = -1, velocity: number = 127, duration: number = 0.25, preRest: number = 0, postRest: number = 0) {
+    constructor(interval: number = 0, pitches: number[] = [], order: number = -1, velocity: number = void 0, duration: number = 0.25, preRest: number = 0, postRest: number = 0) {
         this.interval = interval;
         this.pitches = pitches;
         this.order = order;
@@ -23,7 +21,7 @@ export default class RecurseObject {
     }
 
     public static getInstanceFromIntervalWithRests(interval: number, preRest: number, postRest: number): RecurseObject {
-        return new RecurseObject(interval, [], -1, 127, 0.25, preRest, postRest);
+        return new RecurseObject(interval, [], -1, void 0, 0.25, preRest, postRest);
     }
 
     public static getInstanceFromInterval(interval: number): RecurseObject {
