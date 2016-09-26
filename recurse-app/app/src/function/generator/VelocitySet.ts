@@ -6,26 +6,24 @@ import Value from "../base/Value";
 
 export default class VelocitySet implements INode {
     public type: Entity = Entity.VEL;
-    public children: Array<INode> = [];
+    public children: INode[] = [];
     public parent: INode;
 
-    constructor(parent: INode = null, children: Array<INode> = []) {
+    constructor(parent: INode = null, children: INode[] = []) {
         this.parent = parent;
         this.children = children;
     }
 
-    public generate(context: IContext): Array<IRecurseValue> {
-        var results: Array<IRecurseValue> = [];
+    public generate(context: IContext): IRecurseValue[] {
+        var results: IRecurseValue[] = [];
         for (let child of this.children) {
             results = results.concat(child.generate(context));
         }
         let i = 0;
         for (let result of context.results) {
-            console.log("velocity", result.velocity);
             if (!result.velocity) {
                 result.velocity = results[i % results.length].value;
             }
-            console.log("velocity", result.velocity);
             i++;
         }
         return [];

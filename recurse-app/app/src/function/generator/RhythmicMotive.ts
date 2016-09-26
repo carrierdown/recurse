@@ -118,10 +118,14 @@ export default class RhythmicMotive implements INode {
                 let ro = RecurseObject.getInstanceFromIntervalWithRests(result.value, preRest, 0);
                 if (result.additionalValues && result.additionalValues.length > 0) {
                     for (let additionalValue of result.additionalValues) {
-                        // todo: support velocities as well here
                         if (additionalValue.valueType === ValueType.NOTE || additionalValue.valueType == ValueType.RAW_NOTE) {
                             if (ro.pitches.length === 0) {
                                 ro.pitches.push(additionalValue.value);
+                            }
+                        }
+                        if (additionalValue.valueType === ValueType.VELOCITY) {
+                            if (!ro.velocity) {
+                                ro.velocity = additionalValue.value;
                             }
                         }
                     }

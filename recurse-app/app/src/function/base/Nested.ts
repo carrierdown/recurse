@@ -44,9 +44,8 @@ export default class Nested implements INode {
             // then try matching created path to the closest match in the associated notes and velocities (need special handling for things like alt and maybe also repeat)
 
             this.addAssociatedNodeOfType(Entity.NS, parentRm, path);
-            //this.addAssociatedNodeOfType(Entity.VEL, parentRm, path);
+            this.addAssociatedNodeOfType(Entity.VEL, parentRm, path);
 
-            //console.log('Found target node with type', Entity[targetNode.type], 'and value', targetNode['value']);
             //if (targetNode.type === Entity.NESTED) {
             //    console.log('with first sub value', targetNode.children[0]['value']);
             //}
@@ -68,14 +67,9 @@ export default class Nested implements INode {
          }
         */
 
-        if (results.length > 0 && results[0].valueType !== ValueType.NOTE && results[0].valueType !== ValueType.RAW_NOTE) {
+        if (results.length > 0 && results[0].valueType === ValueType.INTERVAL) {
             let sum: number = 0;
             for (let result of results) {
-                /*
-                 if (_.isNaN(result.value) || result.value === null) {
-                 continue;
-                 }
-                 */
                 sum += result.value;
             }
 
@@ -94,7 +88,14 @@ export default class Nested implements INode {
                     if (!result.additionalValues) {
                         result.additionalValues = [];
                     }
-                    if (result.additionalValues.length === 0) {
+                    let additionalValueOfTypeAlreadyAdded = false;
+                    for (let additionalValue of result.additionalValues) {
+                        if (additionalValue.valueType === associatedResults[i].valueType) {
+                            additionalValueOfTypeAlreadyAdded = true;
+                            break;
+                        }
+                    }
+                    if (!additionalValueOfTypeAlreadyAdded) {
                         result.additionalValues.push({value: associatedResults[i].value, valueType: associatedResults[i].valueType});
                     }
                     i++;
@@ -111,10 +112,13 @@ export default class Nested implements INode {
     private addAssociatedNodeOfType(entity: Entity, parent: INode, path: number[]): void {
         let targetNode: INode = Helpers.getSiblingWithType(parent, entity);
 
+        if (!targetNode) {
+            return;
+        }
+
         for (let index of path) {
             if (targetNode.children.length > 0) {
                 targetNode = targetNode.children[index % targetNode.children.length];
-                //console.log('while', targetNode.type);
                 while ((targetNode.type === Entity.ALT || targetNode.type === Entity.ALT_SHORTHAND) && targetNode.children.length > 0) {
                     let curIx = targetNode['alternationIndex'] || -1;
                     targetNode = targetNode.children[(curIx + 1) % targetNode.children.length];
@@ -123,6 +127,12 @@ export default class Nested implements INode {
                 break;
             }
         }
+        //console.log('Found target node with type', Entity[targetNode.type], 'and value', targetNode['value']);
+
+        if (targetNode.type !== Entity.NESTED && path.length < 2) {
+            return;
+        }
+
         if (this.associatedNodes.indexOf(targetNode) < 0) {
             this.associatedNodes.push(targetNode);
         }
