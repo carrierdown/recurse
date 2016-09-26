@@ -142,10 +142,17 @@ function set_json(jsonString) {
 
 // gets intervals from currently selected clips and converts them to recurse code, then sends resulting code as OSC message to /recurse/intervals
 function get_intervals() {
-    var clipLength = 4,
+    var clipLength = 16,
         clip = new Clip(),
-        noteList = clip.getNotes();
-    var results = [{ intervals: [], notes: [] }], currentResultIndex = 0, currentStartPos, currentEndPos, backlog, output = "";
+        noteList = clip.getNotes(),
+        results = [{ intervals: [], notes: [], velocities: [] }],
+        currentResultIndex = 0,
+        currentStartPos,
+        currentEndPos,
+        backlog,
+        output = "",
+        velocitiesNeeded = false;
+
     noteList.sort(function (a, b) {
         if (a.start > b.start) {
             return 1;
@@ -155,13 +162,14 @@ function get_intervals() {
         }
         return 0;
     });
+
     do {
         backlog = [];
         currentEndPos = currentStartPos = 0;
         for (var _i = 0, noteList_1 = noteList; _i < noteList_1.length; _i++) {
             var note = noteList_1[_i];
             if (!results[currentResultIndex]) {
-                results[currentResultIndex] = { intervals: [], notes: [] };
+                results[currentResultIndex] = { intervals: [], notes: [], velocities: [] };
             }
             var currentResults = results[currentResultIndex];
             if (currentEndPos <= note.start) {
@@ -170,6 +178,10 @@ function get_intervals() {
                 }
                 currentResults.intervals.push(note.duration * 4);
                 currentResults.notes.push(note.pitch);
+                currentResults.velocities.push(note.velocity);
+                if (note.velocity !== 127 && !velocitiesNeeded) {
+                    velocitiesNeeded = true;
+                }
                 currentStartPos = note.start;
                 currentEndPos = note.start + note.duration;
             }
@@ -180,10 +192,11 @@ function get_intervals() {
         noteList = backlog;
         currentResultIndex++;
     } while (backlog.length !== 0);
+
     for (var r = 0; r < results.length; r++) {
         var result = results[r];
         var totalLength = clipLength * 4;
-        if (totalLength !== 16) {
+        if (totalLength !== 64) {
             output += "length(" + totalLength + ") ";
         }
         var rmOutput = "";
@@ -222,7 +235,16 @@ function get_intervals() {
         if (noteValueStatic >= 0) {
             noteOutput = Note.NOTE_NAMES[noteValueStatic].toLowerCase();
         }
-        output += "ns(" + noteOutput + ")" + (r < results.length - 1 ? "; " : "");
+        output += "ns(" + noteOutput + ")";
+        if (velocitiesNeeded) {
+            var velOutput = "";
+            for (var i = 0; i < result.velocities.length; i++) {
+                var velocity = result.velocities[i];
+                velOutput += "" + velocity + (i < result.velocities.length - 1 ? "," : "");
+            }
+            output += " vel(" + velOutput + ")";
+        }
+        output += "" + (r < results.length - 1 ? "; " : "");
     }
     outlet(1, ['/recurse/intervals', output]);
 }

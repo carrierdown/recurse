@@ -1,6 +1,7 @@
 // Intended for use in the recurse connector M4L plugin. Implemented here for easy testing via Tape.
 
 import Note from "../type/Note";
+import {Constants} from "../type/Constants";
 interface INote {
     start: number;
     duration: number;
@@ -12,16 +13,18 @@ interface INote {
 interface IResult {
     intervals: number[];
     notes: number[];
+    velocities: number[];
 }
 
 // Note: This code could be split up a bit more, but I'm keeping everything in one function here since it's targeted as a single function in a M4L patch
-export function convertNoteListToRecurseCode(noteList: INote[], clipLength: number = 4): string {
-    var results: IResult[] = [{intervals: [], notes: []}],
+export function convertNoteListToRecurseCode(noteList: INote[], clipLength: number = 16): string {
+    var results: IResult[] = [{intervals: [], notes: [], velocities: []}],
         currentResultIndex: number = 0,
         currentStartPos: number,
         currentEndPos: number,
         backlog: INote[],
-        output: string = "";
+        output: string = "",
+        velocitiesNeeded = false;
 
     noteList.sort((a: INote, b: INote): number => {
         if (a.start > b.start) {
@@ -36,9 +39,10 @@ export function convertNoteListToRecurseCode(noteList: INote[], clipLength: numb
     do {
         backlog = [];
         currentEndPos = currentStartPos = 0;
+
         for (let note of noteList) {
             if (!results[currentResultIndex]) {
-                results[currentResultIndex] = {intervals: [], notes: []};
+                results[currentResultIndex] = {intervals: [], notes: [], velocities: []};
             }
             let currentResults = results[currentResultIndex];
             if (currentEndPos <= note.start) {
@@ -47,6 +51,10 @@ export function convertNoteListToRecurseCode(noteList: INote[], clipLength: numb
                 }
                 currentResults.intervals.push(note.duration * 4);
                 currentResults.notes.push(note.pitch);
+                currentResults.velocities.push(note.velocity);
+                if (note.velocity !== 127 && !velocitiesNeeded) {
+                    velocitiesNeeded = true;
+                }
                 currentStartPos = note.start;
                 currentEndPos = note.start + note.duration;
             } else {
@@ -61,7 +69,7 @@ export function convertNoteListToRecurseCode(noteList: INote[], clipLength: numb
         let result = results[r];
         let totalLength = clipLength * 4;
 
-        if (totalLength !== 16) {
+        if (totalLength !== Constants.DEFAULT_PATTERN_LENGTH) {
             output += `length(${totalLength}) `;
         }
 
@@ -100,7 +108,18 @@ export function convertNoteListToRecurseCode(noteList: INote[], clipLength: numb
         if (noteValueStatic >= 0) {
             noteOutput = Note.noteNames[noteValueStatic].toLowerCase();
         }
-        output += `ns(${noteOutput})${(r < results.length - 1 ? "; " : "")}`;
+        output += `ns(${noteOutput})`;
+
+        if (velocitiesNeeded) {
+            let velOutput = "";
+            for (let i: number = 0; i < result.velocities.length; i++) {
+                let velocity: number = result.velocities[i];
+                velOutput += `${velocity}${(i < result.velocities.length - 1 ? "," : "")}`;
+            }
+            output += ` vel(${velOutput})`;
+        }
+
+        output += `${(r < results.length - 1 ? "; " : "")}`;
     }
 
     return output;

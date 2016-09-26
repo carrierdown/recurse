@@ -53,7 +53,7 @@ tape('convert straight-forward sequence of notes to one recurse declaration', (t
                 start: 1,
                 duration:.25,
                 pitch: 64,
-                velocity: 127,
+                velocity: 117,
                 muted: 0
             },
             {
@@ -71,8 +71,8 @@ tape('convert straight-forward sequence of notes to one recurse declaration', (t
                 muted: 0
             }
         ],
-        expectedOutput: string = "rm(1,_1,1,_1,1,_6,1,_4) ns(f3,d3,e3,f3)",
-        result: string = convertNoteListToRecurseCode(testInput);
+        expectedOutput: string = "length(16) rm(1,_1,1,_1,1,_6,1,_4) ns(f3,d3,e3,f3) vel(127,127,117,127)",
+        result: string = convertNoteListToRecurseCode(testInput, 4);
 
     test.equal(result, expectedOutput, `Expected test input to be transformed to ${expectedOutput}. Actual output: ${result}`);
     test.end();
