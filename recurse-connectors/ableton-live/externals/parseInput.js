@@ -1,5 +1,5 @@
 inlets = 1;
-outlets = 1;
+outlets = 2;
 
 //--------------------------------------------------------------------
 // Clip class
@@ -142,9 +142,9 @@ function set_json(jsonString) {
 
 // gets intervals from currently selected clips and converts them to recurse code, then sends resulting code as OSC message to /recurse/intervals
 function get_intervals() {
-    var clipLength = 16,
-        clip = new Clip(),
+    var clip = new Clip(),
         noteList = clip.getNotes(),
+        clipLength = clip.getLength(),
         results = [{ intervals: [], notes: [], velocities: [] }],
         currentResultIndex = 0,
         currentStartPos,
@@ -249,13 +249,11 @@ function get_intervals() {
     outlet(1, ['/recurse/intervals', output]);
 }
 
-// dummy function for testing creation of multiple clips in the currently selected track, starting at clip 0
-function setTrackClips() {
-    var notes = [],
+// creates multiple clips in the currently selected track, starting at clip 0
+function set_track_clips(jsonString) {
+    var input = JSON.parse(jsonString),
         liveObject,
-        i,
-        c;
-    var basePath = "live_set view selected_track";
+        basePath = "live_set view selected_track";
     // clip_slot: has_clip, create_clip
     // clip: is_midi_clip, length  -  select_all_notes,
 
@@ -266,38 +264,37 @@ function setTrackClips() {
         return;
     }
 
-    for (i = 0; i < 4; i++) {
-        notes.push(new Note(60, i, 0.5, 127, false));
-    }
+    for (var y = 0; y < input.length; y++) {
+        var notes = input[y];
+        // the liveAPI seems to have some weird issues with comparing directly with 1 and 0, so we use < and > instead
+        if (liveObject.get('has_audio_input') < 1 && liveObject.get('has_midi_input') > 0) {
+            post('track type is valid');
 
-    // the liveAPI seems to have some weird issues with comparing directly with 1 and 0, so we use < and > instead
-    if (liveObject.get('has_audio_input') < 1 && liveObject.get('has_midi_input') > 0) {
-        post('track type is valid');
+            for (i = 0; i < notes.length; i++) {
+                liveObject.goto(basePath + ' clip_slots ' + i);
 
-        for (i = 0; i < 4; i++) {
-            liveObject.goto(basePath + ' clip_slots ' + i);
+                if (liveObject.get('has_clip') < 1) {
+                    liveObject.call('create_clip', '4.0');
+                } else {
+                    post('no clip to create');
+                }
 
-            if (liveObject.get('has_clip') < 1) {
-                liveObject.call('create_clip', '4.0');
-            } else {
-                post('no clip to create');
+                // todo: check length of clip according to data, and adjust if necessary
+
+                liveObject.goto(basePath + ' clip_slots ' + i + ' clip');
+                liveObject.call('select_all_notes');
+                liveObject.call('replace_selected_notes');
+
+                liveObject.call('notes', notes.length);
+                for (c = 0; c < notes.length; c++) {
+                    liveObject.call('note', notes[c].getPitch(),
+                        notes[c].getStart(), notes[c].getDuration(),
+                        notes[c].getVelocity(), notes[c].getMuted());
+                }
+                liveObject.call('done');
             }
-
-            // todo: check length of clip according to data, and adjust if necessary
-
-            liveObject.goto(basePath + ' clip_slots ' + i + ' clip');
-            liveObject.call('select_all_notes');
-            liveObject.call('replace_selected_notes');
-
-            liveObject.call('notes', notes.length);
-            for (c = 0; c < notes.length; c++) {
-                liveObject.call('note', notes[c].getPitch(),
-                    notes[c].getStart(), notes[c].getDuration(),
-                    notes[c].getVelocity(), notes[c].getMuted());
-            }
-            liveObject.call('done');
+        } else {
+            post('not a midi track!');
         }
-    } else {
-        post('not a midi track!');
     }
 }
