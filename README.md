@@ -4,12 +4,12 @@
 
 `re<urse` is a language for generating musical patterns.
 
-### Why re<urse
+### Why `re<urse`
 
 You might ask why you need a new language for this purpose.
 
 - Focus on minimal syntax
-- Many existing implementations focus heavily on synthesis. Since re<urse is focused purely on sequencing, it can focus on a few simple constructs and should therefore be easy to learn.
+- Many existing implementations focus heavily on synthesis. Since `re<urse` is focused purely on sequencing, it can focus on a few simple constructs and should therefore be easy to learn.
 - It is designed to augment your existing workflow rather than adding yet another environment, meaning that it works by scripting an existing host like Ableton Live, Bitwig Studio, or Renoise. In fact, it _only_ works in conjunction with an existing DAW - it produces no audio or midi output on its own.
 
 ### Status
