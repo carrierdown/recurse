@@ -1,6 +1,8 @@
-# re<urse
+![Recurse](https://raw.github.com/carrierdown/recurse/master/images/recurselogo2.png)
 
-re<urse is a language for generating musical patterns.
+## `re<urse`
+
+`re<urse` is a language for generating musical patterns.
 
 ### Why re<urse
 
