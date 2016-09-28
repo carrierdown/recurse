@@ -249,6 +249,35 @@ function get_intervals() {
     outlet(1, ['/recurse/intervals', output]);
 }
 
+function convertPitch(pitch) {
+    if (pitch < 0) return 0;
+    if (pitch > 127) return 127;
+    return pitch;
+}
+
+function convertStart(start) {
+    // we convert to strings with decimals to work around a bug in Max
+    // otherwise we get an invalid syntax error when trying to set notes
+    if (start <= 0) return "0.0";
+    return start.toFixed(4);
+}
+
+function convertDuration(duration) {
+    if (duration <= Note.MIN_DURATION) return Note.MIN_DURATION;
+    return duration.toFixed(4); // workaround similar bug as with getStart()
+}
+
+function convertVelocity(velocity) {
+    if (velocity < 0) return 0;
+    if (velocity > 127) return 127;
+    return velocity;
+}
+
+function convertMuted(muted) {
+    if (muted) return 1;
+    return 0;
+}
+
 // creates multiple clips in the currently selected track, starting at clip 0
 function set_track_clips(jsonString) {
     var input = JSON.parse(jsonString),
@@ -264,37 +293,37 @@ function set_track_clips(jsonString) {
         return;
     }
 
-    for (var y = 0; y < input.length; y++) {
-        var notes = input[y];
-        // the liveAPI seems to have some weird issues with comparing directly with 1 and 0, so we use < and > instead
-        if (liveObject.get('has_audio_input') < 1 && liveObject.get('has_midi_input') > 0) {
-            post('track type is valid');
+    // the liveAPI seems to have some weird issues with comparing directly with 1 and 0, so we use < and > instead
+    if (liveObject.get('has_audio_input') < 1 && liveObject.get('has_midi_input') > 0) {
+        post('track type is valid');
 
-            for (i = 0; i < notes.length; i++) {
-                liveObject.goto(basePath + ' clip_slots ' + i);
+        for (var i = 0; i < input.length; i++) {
+            var notes = input[i];
 
-                if (liveObject.get('has_clip') < 1) {
-                    liveObject.call('create_clip', '4.0');
-                } else {
-                    post('no clip to create');
-                }
+            liveObject.goto(basePath + ' clip_slots ' + i);
 
-                // todo: check length of clip according to data, and adjust if necessary
-
-                liveObject.goto(basePath + ' clip_slots ' + i + ' clip');
-                liveObject.call('select_all_notes');
-                liveObject.call('replace_selected_notes');
-
-                liveObject.call('notes', notes.length);
-                for (c = 0; c < notes.length; c++) {
-                    liveObject.call('note', notes[c].getPitch(),
-                        notes[c].getStart(), notes[c].getDuration(),
-                        notes[c].getVelocity(), notes[c].getMuted());
-                }
-                liveObject.call('done');
+            if (liveObject.get('has_clip') < 1) {
+                liveObject.call('create_clip', '4.0');
+            } else {
+                post('no clip to create');
             }
-        } else {
-            post('not a midi track!');
+
+            // todo: check length of clip according to data, and adjust if necessary
+
+            liveObject.goto(basePath + ' clip_slots ' + i + ' clip');
+            liveObject.call('select_all_notes');
+            liveObject.call('replace_selected_notes');
+
+            liveObject.call('notes', notes.length);
+            for (var c = 0; c < notes.length; c++) {
+                liveObject.call('note', convertPitch(notes[c].pitch),
+                    convertStart(notes[c].start), convertDuration(notes[c].duration),
+                    convertVelocity(notes[c].velocity), convertMuted(false));
+            }
+            liveObject.call('done');
         }
+    } else {
+        post('not a midi track!');
     }
 }
+
