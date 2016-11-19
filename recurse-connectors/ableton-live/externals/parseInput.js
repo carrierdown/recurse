@@ -244,7 +244,7 @@ function get_intervals() {
             }
             output += " vel(" + velOutput + ")";
         }
-        output += "" + (r < results.length - 1 ? "; " : "");
+        output += "" + (r < results.length - 1 ? ";\n" : "");
     }
     outlet(1, ['/recurse/intervals', output]);
 }
