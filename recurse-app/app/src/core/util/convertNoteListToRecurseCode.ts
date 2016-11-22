@@ -16,8 +16,13 @@ interface IResult {
     velocities: number[];
 }
 
+const enum ConversionStrategy {
+    compact,
+    drum
+}
+
 // Note: This code could be split up a bit more, but I'm keeping everything in one function here since it's targeted as a single function in a M4L patch
-export function convertNoteListToRecurseCode(noteList: INote[], clipLength: number = 16): string {
+export function convertNoteListToRecurseCode(noteList: INote[], clipLength: number = 16, strategy: ConversionStrategy = ConversionStrategy.compact): string {
     var results: IResult[] = [{intervals: [], notes: [], velocities: []}],
         currentResultIndex: number = 0,
         currentStartPos: number,
@@ -39,13 +44,14 @@ export function convertNoteListToRecurseCode(noteList: INote[], clipLength: numb
     do {
         backlog = [];
         currentEndPos = currentStartPos = 0;
+        let currentPitch = noteList[0].pitch;
 
         for (let note of noteList) {
             if (!results[currentResultIndex]) {
                 results[currentResultIndex] = {intervals: [], notes: [], velocities: []};
             }
             let currentResults = results[currentResultIndex];
-            if (currentEndPos <= note.start) {
+            if (currentEndPos <= note.start && (note.pitch === currentPitch || strategy === ConversionStrategy.compact)) {
                 if (currentEndPos < note.start) {
                     currentResults.intervals.push(0 - ((note.start - currentEndPos) * 4)); // negative signifies blank intervals
                 }
