@@ -1,0 +1,21 @@
+[
+  {
+    "notes": [
+      {"start":0},
+      {"start":16}
+    ],
+    "loopLength": 128
+  },
+  {
+    "notes": [
+      {"start":0}
+    ],
+    "loopLength": 64
+  },
+  {
+    "notes": [
+      {"start":0}
+    ],
+    "loopLength": 32
+  }
+]

@@ -50,10 +50,13 @@ tape('Testing compiler with valid code', (test) => {
 
         if (expectedContent.length > 0) {
             let expectedResultsSets = JSON.parse(expectedContent) as IClip[];
-            console.log(expectedResultsSets);
+            // console.log(expectedResultsSets);
             for (let i = 0; i < expectedResultsSets.length; i++) {
                 let expectedResults = expectedResultsSets[i];
                 test.equal(expectedResults.notes.length, compile.result[i].notes.length, `Expected output length ${expectedResults.notes.length} and actual output length ${compile.result[i].notes.length} should be the same`);
+                if (expectedResults.loopLength) {
+                    test.equal(expectedResults.loopLength, compile.result[i].loopLength, `Property loopLength: Expected ${expectedResults.loopLength}, found ${compile.result[i].loopLength}`);
+                }
                 for (let x = 0; x < expectedResults.notes.length; x++) {
                     let expectedResult = expectedResults.notes[x];
                     let compiledResult = compile.result[i].notes[x];
@@ -68,7 +71,7 @@ tape('Testing compiler with valid code', (test) => {
         }
     }, () => {
         test.end();
-    }/*, 'velNested.rse'*/);
+    }/*, 'patternLengthVisibleInOutput.rse'*/);
 });
 
 
