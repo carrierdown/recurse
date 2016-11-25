@@ -1,46 +1,50 @@
-[[
+[
   {
-    "start": 0,
-    "pitch": 60
-  },
-  {
-    "start": 1.5,
-    "pitch": 62
-  },
-  {
-    "start": 3,
-    "pitch": 64
-  },
-  {
-    "start": 4.5,
-    "pitch": 65
-  },
-  {
-    "start": 6,
-    "pitch": 67
-  },
-  {
-    "start": 7.5,
-    "pitch": 69
-  },
-  {
-    "start": 9,
-    "pitch": 71
-  },
-  {
-    "start": 10.5,
-    "pitch": 72
-  },
-  {
-    "start": 12,
-    "pitch": 74
-  },
-  {
-    "start": 13.5,
-    "pitch": 76
-  },
-  {
-    "start": 15,
-    "pitch": 77
+    "notes": [
+      {
+        "start": 0,
+        "pitch": 60
+      },
+      {
+        "start": 1.5,
+        "pitch": 62
+      },
+      {
+        "start": 3,
+        "pitch": 64
+      },
+      {
+        "start": 4.5,
+        "pitch": 65
+      },
+      {
+        "start": 6,
+        "pitch": 67
+      },
+      {
+        "start": 7.5,
+        "pitch": 69
+      },
+      {
+        "start": 9,
+        "pitch": 71
+      },
+      {
+        "start": 10.5,
+        "pitch": 72
+      },
+      {
+        "start": 12,
+        "pitch": 74
+      },
+      {
+        "start": 13.5,
+        "pitch": 76
+      },
+      {
+        "start": 15,
+        "pitch": 77
+      }
+    ]
   }
-]]
+]

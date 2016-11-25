@@ -4,11 +4,12 @@ import RecurseObject from "../core/type/RecurseObject";
 import NoteEvent from "../core/type/NoteEvent";
 import INode from "../interpreter/INode";
 import {Constants} from "../core/type/Constants";
+import {IClip} from "./IClip";
 
 // "flattens" sequence for consumption by a typical sequencer. Flattening makes intervals relative to zero rather than the preceding note event
-export default function flatten(itemsSets: Array<Array<RecurseObject>>): Array<Array<NoteEvent>> {
+export default function flatten(itemsSets: Array<Array<RecurseObject>>, clipRootNodes: INode[]): IClip[] {
     var currentPos: number = 0,
-        flattenedResultsSets: Array<Array<NoteEvent>> = [],
+        flattenedResultsSets: IClip[] = [],
         flattenedResults: Array<NoteEvent> = [],
         currentRefNode: INode = null;
 
@@ -29,7 +30,7 @@ export default function flatten(itemsSets: Array<Array<RecurseObject>>): Array<A
             }
             currentPos += interval + getQuarterNoteValue(item.postRest);
         }
-        flattenedResultsSets.push(_.clone(flattenedResults));
+        flattenedResultsSets.push({notes:_.clone(flattenedResults), loopLength: clipRootNodes[i].contextRef.patternLength} as IClip);
         flattenedResults = [];
     }
     return flattenedResultsSets;

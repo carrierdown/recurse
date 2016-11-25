@@ -65,6 +65,13 @@ tape('convert notes on different pitches to separate declarations when using dru
                 muted: 0
             },
             {
+                start: 4,
+                duration: 1,
+                pitch: 60,
+                velocity: 127,
+                muted: 0
+            },
+            {
                 start: 6,
                 duration: 1,
                 pitch: 61,
@@ -72,7 +79,7 @@ tape('convert notes on different pitches to separate declarations when using dru
                 muted: 0
             }
         ],
-        expectedOutput: string = "length(32) rm(_4,4,_24) ns(c3); length(32) rm(_8,16,_8) ns(d3); length(32) rm(_12,4,_16) ns(e3); length(32) rm(_24,4,_4) ns(c#3)",
+        expectedOutput: string = "length(32) rm(_4,4,_8,4,_12) ns(c3); length(32) rm(_8,16,_8) ns(d3); length(32) rm(_12,4,_16) ns(e3); length(32) rm(_24,4,_4) ns(c#3)",
         result: string = convertNoteListToRecurseCode(testInput, 8, 1 /* DRUM mode */);
 
     test.equal(result, expectedOutput, `Expected test input to be transformed to ${expectedOutput}. Actual output: ${result}`);

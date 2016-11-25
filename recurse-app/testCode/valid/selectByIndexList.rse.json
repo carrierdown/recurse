@@ -1,66 +1,70 @@
-[[
+[
   {
-    "start": 0,
-    "pitch": 72
-  },
-  {
-    "start": 1,
-    "pitch": 60
-  },
-  {
-    "start": 2,
-    "pitch": 60
-  },
-  {
-    "start": 3,
-    "pitch": 60
-  },
-  {
-    "start": 4,
-    "pitch": 72
-  },
-  {
-    "start": 5,
-    "pitch": 72
-  },
-  {
-    "start": 6,
-    "pitch": 60
-  },
-  {
-    "start": 7,
-    "pitch": 72
-  },
-  {
-    "start": 8,
-    "pitch": 60
-  },
-  {
-    "start": 9,
-    "pitch": 60
-  },
-  {
-    "start": 10,
-    "pitch": 60
-  },
-  {
-    "start": 11,
-    "pitch": 60
-  },
-  {
-    "start": 12,
-    "pitch": 60
-  },
-  {
-    "start": 13,
-    "pitch": 60
-  },
-  {
-    "start": 14,
-    "pitch": 60
-  },
-  {
-    "start": 15,
-    "pitch": 72
+    "notes": [
+      {
+        "start": 0,
+        "pitch": 72
+      },
+      {
+        "start": 1,
+        "pitch": 60
+      },
+      {
+        "start": 2,
+        "pitch": 60
+      },
+      {
+        "start": 3,
+        "pitch": 60
+      },
+      {
+        "start": 4,
+        "pitch": 72
+      },
+      {
+        "start": 5,
+        "pitch": 72
+      },
+      {
+        "start": 6,
+        "pitch": 60
+      },
+      {
+        "start": 7,
+        "pitch": 72
+      },
+      {
+        "start": 8,
+        "pitch": 60
+      },
+      {
+        "start": 9,
+        "pitch": 60
+      },
+      {
+        "start": 10,
+        "pitch": 60
+      },
+      {
+        "start": 11,
+        "pitch": 60
+      },
+      {
+        "start": 12,
+        "pitch": 60
+      },
+      {
+        "start": 13,
+        "pitch": 60
+      },
+      {
+        "start": 14,
+        "pitch": 60
+      },
+      {
+        "start": 15,
+        "pitch": 72
+      }
+    ]
   }
-]]
+]

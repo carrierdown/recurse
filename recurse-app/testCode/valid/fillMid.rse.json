@@ -1,12 +1,16 @@
-[[
+[
   {
-    "start": 0,
-    "duration": 0.5,
-    "pitch": 72
-  },
-  {
-    "start": 15,
-    "duration": 1,
-    "pitch": 74
+    "notes": [
+      {
+        "start": 0,
+        "duration": 0.5,
+        "pitch": 72
+      },
+      {
+        "start": 15,
+        "duration": 1,
+        "pitch": 74
+      }
+    ]
   }
-]]
+]

@@ -7,6 +7,7 @@ import RecurseResult from "./core/type/RecurseResult";
 import RecurseStatus from "./core/type/RecurseStatus";
 import ErrorMessages from "./compiler/ErrorMessages";
 import NoteEvent from "./core/type/NoteEvent";
+import {IClip} from "./converter/IClip";
 
 program
     .version('0.0.1')
@@ -37,7 +38,7 @@ if (program['args'].length > 0) {
 
 function doCompile(filename, preview, debug) {
     var compiler = new Compiler(),
-        result: RecurseResult<NoteEvent[][]> = new RecurseResult<NoteEvent[][]>();
+        result: RecurseResult<IClip[]> = new RecurseResult<IClip[]>();
 
     compiler.setPreview(preview);
     compiler.setDebug(debug);

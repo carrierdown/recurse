@@ -1,17 +1,21 @@
-[[
+[
   {
-    "start": 0,
-    "duration": 4,
-    "pitch": 60
-  },
-  {
-    "start": 4,
-    "duration": 8,
-    "pitch": 60
-  },
-  {
-    "start": 12,
-    "duration": 4,
-    "pitch": 72
+    "notes": [
+      {
+        "start": 0,
+        "duration": 4,
+        "pitch": 60
+      },
+      {
+        "start": 4,
+        "duration": 8,
+        "pitch": 60
+      },
+      {
+        "start": 12,
+        "duration": 4,
+        "pitch": 72
+      }
+    ]
   }
-]]
+]

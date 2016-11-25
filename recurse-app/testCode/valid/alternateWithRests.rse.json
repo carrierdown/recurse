@@ -1,26 +1,30 @@
-[[
+[
   {
-    "start": 0,
-    "duration": 1
-  },
-  {
-    "start": 1,
-    "duration": 4
-  },
-  {
-    "start": 5,
-    "duration": 1
-  },
-  {
-    "start": 8,
-    "duration": 4
-  },
-  {
-    "start": 14,
-    "duration": 1
-  },
-  {
-    "start": 15,
-    "duration": 1
+    "notes": [
+      {
+        "start": 0,
+        "duration": 1
+      },
+      {
+        "start": 1,
+        "duration": 4
+      },
+      {
+        "start": 5,
+        "duration": 1
+      },
+      {
+        "start": 8,
+        "duration": 4
+      },
+      {
+        "start": 14,
+        "duration": 1
+      },
+      {
+        "start": 15,
+        "duration": 1
+      }
+    ]
   }
-]]
+]

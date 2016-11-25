@@ -8,6 +8,7 @@ export default class Root implements INode {
     public children: Array<INode>;
     public parent: INode;
     public newClip: boolean;
+    public contextRef: IContext;
 
     constructor(newClip: boolean) {
         this.parent = null;
@@ -19,6 +20,8 @@ export default class Root implements INode {
     public generate(context: IContext): Array<IRecurseValue> {
         //var offsetMultiplier: number = 0;
         context.createNewClip = this.newClip;
+        this.contextRef = context;
+
         for (let child of this.children) {
 /*
             if (child.type === Entity.RM) {

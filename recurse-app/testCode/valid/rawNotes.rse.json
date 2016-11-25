@@ -1,10 +1,14 @@
-[[
+[
   {
-    "start": 0,
-    "pitch": 1
-  },
-  {
-    "start": 8,
-    "pitch": 2
+    "notes": [
+      {
+        "start": 0,
+        "pitch": 1
+      },
+      {
+        "start": 8,
+        "pitch": 2
+      }
+    ]
   }
-]]
+]

@@ -1,20 +1,22 @@
 [
-  [
-    {
-      "start": 0,
-      "pitch": 60
-    },
-    {
-      "start": 4,
-      "pitch": 60
-    },
-    {
-      "start": 8,
-      "pitch": 60
-    },
-    {
-      "start": 12,
-      "pitch": 72
-    }
-  ]
+  {
+    "notes": [
+      {
+        "start": 0,
+        "pitch": 60
+      },
+      {
+        "start": 4,
+        "pitch": 60
+      },
+      {
+        "start": 8,
+        "pitch": 60
+      },
+      {
+        "start": 12,
+        "pitch": 72
+      }
+    ]
+  }
 ]

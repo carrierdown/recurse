@@ -1,32 +1,34 @@
 [
-  [
-    {
-      "start": 0,
-      "pitch": 60
-    },
-    {
-      "start": 4,
-      "pitch": 62
-    },
-    {
-      "start": 6,
-      "pitch": 64
-    },
-    {
-      "start": 8,
-      "pitch": 65
-    },
-    {
-      "start": 10,
-      "pitch": 67
-    },
-    {
-      "start": 12,
-      "pitch": 69
-    },
-    {
-      "start": 14,
-      "pitch": 71
-    }
-  ]
+  {
+    "notes": [
+      {
+        "start": 0,
+        "pitch": 60
+      },
+      {
+        "start": 4,
+        "pitch": 62
+      },
+      {
+        "start": 6,
+        "pitch": 64
+      },
+      {
+        "start": 8,
+        "pitch": 65
+      },
+      {
+        "start": 10,
+        "pitch": 67
+      },
+      {
+        "start": 12,
+        "pitch": 69
+      },
+      {
+        "start": 14,
+        "pitch": 71
+      }
+    ]
+  }
 ]

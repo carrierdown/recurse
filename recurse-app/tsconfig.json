@@ -17,6 +17,7 @@
         "app/src/compiler/ErrorMessages.ts",
         "app/src/compiler/ICompilerSettings.ts",
         "app/src/compiler/compiler.spec.ts",
+        "app/src/converter/IClip.ts",
         "app/src/converter/flatten.ts",
         "app/src/core/type/Constants.ts",
         "app/src/core/type/IRecurseValue.ts",
