@@ -206,12 +206,14 @@ export default class Parser {
     }
 
     public static preProcessTokens(tokenSet: IToken[]): void {
-        for (let i = 0; i < tokenSet.length; i++) {
-            if (i > 0) {
-                if (Parser.COMMA_LEFT_HAND_SIDE_TOKENS.indexOf(tokenSet[i - 1].type) >= 0 &&
-                    Parser.COMMA_RIGHT_HAND_SIDE_TOKENS.indexOf(tokenSet[i].type) >= 0) {
-                    tokenSet.splice(i, 0, {type: TokenType.COMMA, value: ',', pos: tokenSet[i].pos - 1} as IToken);
-                }
+        if (tokenSet.length < 2) {
+            return;
+        }
+        for (let i = 1; i < tokenSet.length; i++) {
+            if (Parser.COMMA_LEFT_HAND_SIDE_TOKENS.indexOf(tokenSet[i - 1].type) >= 0 &&
+                Parser.COMMA_RIGHT_HAND_SIDE_TOKENS.indexOf(tokenSet[i].type) >= 0) {
+                tokenSet.splice(i, 0, {type: TokenType.COMMA, value: ',', pos: tokenSet[i].pos - 1} as IToken);
+                i++;
             }
         }
     }
