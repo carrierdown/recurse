@@ -1,1 +1,1 @@
-rm(16,48) ns(c3,c4) loop(2)
+rm(16 48) ns(c3 c4) loop(2)

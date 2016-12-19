@@ -1,1 +1,1 @@
-rm(32(alt(1,1x2)), 32( 1(alt(1x2,1)), 1(alt(1,1x2)) ) )  ns(c3,c3(alt(c2(c4),c5),d4))
+rm(32(alt(1 1x2))  32( 1(alt(1x2 1))  1(alt(1 1x2)) ) )  ns(c3 c3(alt(c2(c4) c5) d4))

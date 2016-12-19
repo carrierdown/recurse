@@ -30,7 +30,7 @@ export default function flatten(itemsSets: Array<Array<RecurseObject>>, clipRoot
             }
             currentPos += interval + getQuarterNoteValue(item.postRest);
         }
-        flattenedResultsSets.push({notes:_.clone(flattenedResults), loopLength: clipRootNodes[i].contextRef.patternLength} as IClip);
+        flattenedResultsSets.push({notes:_.clone(flattenedResults), loopLength: clipRootNodes[i].contextRef.patternLength / 4} as IClip);
         flattenedResults = [];
     }
     return flattenedResultsSets;

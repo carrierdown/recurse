@@ -1,2 +1,2 @@
-rm(16,48) ns(c3) loop(2);;
-rm(48,16) ns(d3)
+rm(16 48) ns(c3) loop(2);;
+rm(48 16) ns(d3)

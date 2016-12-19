@@ -48,6 +48,14 @@ export default class Parser {
         return [Entity.PATTERN_LENGTH, Entity.LOOP_FACTOR, Entity.SET_SCALE];
     }
 
+    public static get COMMA_LEFT_HAND_SIDE_TOKENS(): TokenType[] {
+        return [TokenType.NUMBER, TokenType.NOTE, TokenType.MULTIPLY, TokenType.RIGHT_PAREN];
+    }
+
+    public static get COMMA_RIGHT_HAND_SIDE_TOKENS(): TokenType[] {
+        return [TokenType.NUMBER, TokenType.NOTE, TokenType.MULTIPLY, TokenType.IDENTIFIER, TokenType.UNDERSCORE];
+    }
+
     public static tokenSetLookAhead(tokenSet: Array<IToken>, position: number, lookAhead: number): IToken {
         if (position + lookAhead >= tokenSet.length) {
             return {type: TokenType.END, pos: -1, value: ''};
@@ -197,6 +205,17 @@ export default class Parser {
         return node.children[node.children.length - 1];
     }
 
+    public static preProcessTokens(tokenSet: IToken[]): void {
+        for (let i = 0; i < tokenSet.length; i++) {
+            if (i > 0) {
+                if (Parser.COMMA_LEFT_HAND_SIDE_TOKENS.indexOf(tokenSet[i - 1].type) >= 0 &&
+                    Parser.COMMA_RIGHT_HAND_SIDE_TOKENS.indexOf(tokenSet[i].type) >= 0) {
+                    tokenSet.splice(i, 0, {type: TokenType.COMMA, value: ',', pos: tokenSet[i].pos - 1} as IToken);
+                }
+            }
+        }
+    }
+
     public static parseTokensToSyntaxTree(tokenSet: Array<IToken>): RecurseResult<ISyntaxTree> {
         var current: INode = Parser.createNode(Entity.ROOT, null),
             syntaxTree: ISyntaxTree = new SyntaxTree(),
@@ -207,6 +226,8 @@ export default class Parser {
                 ErrorMessages.PARENTHESES_DO_NOT_MATCH
             ));
         }
+
+        Parser.preProcessTokens(tokenSet);
 
         syntaxTree.rootNodes[0] = current;
         current = Parser.addNodeToChildrenAndRetrieve(current, Entity.CHAIN);
@@ -378,6 +399,8 @@ export default class Parser {
                     } else {
                         current.children.push(Parser.createNode(entity, current));
                     }
+                    break;
+                case TokenType.REPEAT:
                     break;
                 default:
                     // probably throw error here

@@ -298,7 +298,8 @@ function set_track_clips(jsonString) {
         post('track type is valid');
 
         for (var i = 0; i < input.length; i++) {
-            var notes = input[i];
+            var notes = input[i].notes,
+                loopLength = input[i].loopLength;
 
             liveObject.goto(basePath + ' clip_slots ' + i);
 
@@ -308,9 +309,9 @@ function set_track_clips(jsonString) {
                 post('no clip to create');
             }
 
-            // todo: check length of clip according to data, and adjust if necessary
-
             liveObject.goto(basePath + ' clip_slots ' + i + ' clip');
+            liveObject.call('looping', 1);
+            liveObject.call('loop_end', loopLength);
             liveObject.call('select_all_notes');
             liveObject.call('replace_selected_notes');
 

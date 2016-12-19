@@ -1,1 +1,1 @@
-rm(rng(1,4),*) ns(c3)
+rm(rng(1 4) *) ns(c3)

@@ -6,6 +6,7 @@ import RecurseObject from '../core/type/RecurseObject';
 import IContext from './IContext';
 import Scale from "../core/type/Scale";
 import Note from "../core/type/Note";
+import {Constants} from "../core/type/Constants";
 
 export default class SyntaxTree implements ISyntaxTree {
     public rootNodes: Array<INode> = [];
@@ -17,7 +18,7 @@ export default class SyntaxTree implements ISyntaxTree {
                 results: [],
                 selectedIndexes: [],
                 selectionActive: false,
-                patternLength: 64,
+                patternLength: Constants.DEFAULT_PATTERN_LENGTH,
                 startOffset: 0,
                 loopFactor: 1,
                 startPosition: 0,
