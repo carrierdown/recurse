@@ -310,8 +310,6 @@ function set_track_clips(jsonString) {
             }
 
             liveObject.goto(basePath + ' clip_slots ' + i + ' clip');
-            liveObject.call('looping', 1);
-            liveObject.call('loop_end', loopLength);
             liveObject.call('select_all_notes');
             liveObject.call('replace_selected_notes');
 
@@ -322,6 +320,8 @@ function set_track_clips(jsonString) {
                     convertVelocity(notes[c].velocity), convertMuted(false));
             }
             liveObject.call('done');
+            liveObject.set('looping', 1);
+            liveObject.set('loop_end', loopLength);
         }
     } else {
         post('not a midi track!');
