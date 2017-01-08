@@ -143,7 +143,7 @@ export default class RhythmicMotive implements INode {
                 }
             } else {
                 let restValue = result.valueType === ValueType.FILL ? fillNodeValue : result.value;
-                if (context.results.length === 0) { // if this is element #0, set preRest for next RO added
+                if (context.results.length === 0 || context.results[context.results.length - 1].postRest > 0) { // if this is element #0, or previously created RO has postRest already set, set preRest for next RO added
                     preRest = restValue;
                 } else {
                     context.results[context.results.length - 1].postRest = restValue; // ...otherwise set postRest for previously added RO
