@@ -141,7 +141,7 @@ function set_json(jsonString) {
 }
 
 // gets intervals from currently selected clips and converts them to recurse code, then sends resulting code as OSC message to /recurse/intervals
-function get_intervals() {
+function get_intervals(strategy) {
     var clip = new Clip(),
         noteList = clip.getNotes(),
         clipLength = clip.getLength(),
@@ -152,6 +152,7 @@ function get_intervals() {
         backlog,
         output = "",
         velocitiesNeeded = false;
+    strategy = strategy || 0;
 
     noteList.sort(function (a, b) {
         if (a.start > b.start) {
@@ -166,13 +167,14 @@ function get_intervals() {
     do {
         backlog = [];
         currentEndPos = currentStartPos = 0;
+        var currentPitch = noteList[0].pitch;
         for (var _i = 0, noteList_1 = noteList; _i < noteList_1.length; _i++) {
             var note = noteList_1[_i];
             if (!results[currentResultIndex]) {
                 results[currentResultIndex] = { intervals: [], notes: [], velocities: [] };
             }
             var currentResults = results[currentResultIndex];
-            if (currentEndPos <= note.start) {
+            if (currentEndPos <= note.start && (note.pitch === currentPitch || strategy === 0)) {
                 if (currentEndPos < note.start) {
                     currentResults.intervals.push(0 - ((note.start - currentEndPos) * 4));
                 }
@@ -193,8 +195,24 @@ function get_intervals() {
         currentResultIndex++;
     } while (backlog.length !== 0);
 
+    var compactArray = function (elements) {
+        if (elements.length < 2) {
+            return elements;
+        }
+        for (var i = 1; i < elements.length; i++) {
+            if (elements[i - 1] !== elements[i]) {
+                return elements;
+            }
+        }
+        return [elements[0]];
+    };
+
     for (var r = 0; r < results.length; r++) {
         var result = results[r];
+        result.intervals = compactArray(result.intervals);
+        result.velocities = compactArray(result.velocities);
+        result.notes = compactArray(result.notes);
+
         var totalLength = clipLength * 4;
         if (totalLength !== 64) {
             output += "length(" + totalLength + ") ";
@@ -211,7 +229,7 @@ function get_intervals() {
             }
             totalLength -= interval;
             if (i < result.intervals.length - 1) {
-                rmOutput += ",";
+                rmOutput += " ";
             }
         }
         if (totalLength > 0) {
@@ -230,7 +248,7 @@ function get_intervals() {
                     noteValueStatic = -2;
                 }
             }
-            noteOutput += Note.NOTE_NAMES[note].toLowerCase() + (i < result.notes.length - 1 ? "," : "");
+            noteOutput += Note.NOTE_NAMES[note].toLowerCase() + (i < result.notes.length - 1 ? " " : "");
         }
         if (noteValueStatic >= 0) {
             noteOutput = Note.NOTE_NAMES[noteValueStatic].toLowerCase();
@@ -240,7 +258,7 @@ function get_intervals() {
             var velOutput = "";
             for (var i = 0; i < result.velocities.length; i++) {
                 var velocity = result.velocities[i];
-                velOutput += "" + velocity + (i < result.velocities.length - 1 ? "," : "");
+                velOutput += "" + velocity + (i < result.velocities.length - 1 ? " " : "");
             }
             output += " vel(" + velOutput + ")";
         }

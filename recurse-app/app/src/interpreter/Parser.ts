@@ -137,6 +137,9 @@ export default class Parser {
                 return Entity.EVEN;
             case 'first':
                 return Entity.FIRST;
+            case 'itrpl':
+            case 'interpolate':
+                return Entity.INTERPOLATE;
             case 'loop':
                 return Entity.LOOP_FACTOR;
             case 'last':

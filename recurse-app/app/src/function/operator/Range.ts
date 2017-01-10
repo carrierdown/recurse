@@ -17,6 +17,7 @@ export default class Range implements INode {
         this.children = [];
     }
 
+    // todo: support automatic scaling of values according to number of notes if used on e.g. velocities?
     public generate(context: IContext): Array<IRecurseValue> {
         if (this.children.length !== 2) {
             console.log('WARN: Range produced no output due to incorrect number of params. Expected 2 and got ' + this.children.length);

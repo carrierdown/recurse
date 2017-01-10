@@ -71,8 +71,25 @@ export function convertNoteListToRecurseCode(noteList: INote[], clipLength: numb
         currentResultIndex++;
     } while (backlog.length !== 0);
 
+    // returns 1-element array with value if all values are equal, otherwise the unmodified array
+    var compactArray = (elements: any[]): any[] => {
+        if (elements.length < 2) {
+            return elements;
+        }
+        for (let i = 1; i < elements.length; i++) {
+            if (elements[i - 1] !== elements[i]) {
+                return elements;
+            }
+        }
+        return [elements[0]];
+    };
+
     for (let r: number = 0; r < results.length; r++) {
         let result = results[r];
+        result.intervals = compactArray(result.intervals);
+        result.velocities = compactArray(result.velocities);
+        result.notes = compactArray(result.notes);
+
         let totalLength = clipLength * 4;
 
         if (totalLength !== Constants.DEFAULT_PATTERN_LENGTH) {
@@ -90,7 +107,7 @@ export function convertNoteListToRecurseCode(noteList: INote[], clipLength: numb
             }
             totalLength -= interval;
             if (i < result.intervals.length - 1) {
-                rmOutput += ",";
+                rmOutput += " ";
             }
         }
         if (totalLength > 0) {
@@ -109,7 +126,7 @@ export function convertNoteListToRecurseCode(noteList: INote[], clipLength: numb
                     noteValueStatic = -2;
                 }
             }
-            noteOutput += Note.noteNames[note].toLowerCase() + (i < result.notes.length - 1 ? "," : "");
+            noteOutput += Note.noteNames[note].toLowerCase() + (i < result.notes.length - 1 ? " " : "");
         }
         if (noteValueStatic >= 0) {
             noteOutput = Note.noteNames[noteValueStatic].toLowerCase();
@@ -120,12 +137,12 @@ export function convertNoteListToRecurseCode(noteList: INote[], clipLength: numb
             let velOutput = "";
             for (let i: number = 0; i < result.velocities.length; i++) {
                 let velocity: number = result.velocities[i];
-                velOutput += `${velocity}${(i < result.velocities.length - 1 ? "," : "")}`;
+                velOutput += `${velocity}${(i < result.velocities.length - 1 ? " " : "")}`;
             }
             output += ` vel(${velOutput})`;
         }
 
-        output += `${(r < results.length - 1 ? "; " : "")}`;
+        output += `${(r < results.length - 1 ? ";\n" : "")}`;
     }
 
     return output;
