@@ -11,19 +11,20 @@ export default class Pitch implements INode {
     public type: Entity = Entity.PITCH;
     public children: Array<INode> = [];
     public parent: INode;
+    private plusMode: boolean;
 
-    constructor(parent: INode = null, children: Array<INode> = []) {
+    constructor(parent: INode = null, children: Array<INode> = [], plusMode = true) {
         this.parent = parent;
         this.children = children;
+        this.plusMode = plusMode;
     }
 
     public generate(context: IContext): Array<IRecurseValue> {
         var results: Array<IRecurseValue> = [],
-            ix: number = 0,
-            rix: number = 0,
-            pix: number = 0,
+            iterationCounter: number = 1,
             doPitch = (index: number, pitch: number): number => {
-                return pitch += results[index % results.length].value;
+                iterationCounter = Math.floor(index / results.length) + 1;
+                return pitch + results[index % results.length].value * (this.plusMode ? iterationCounter : 1);
             };
 
         _.forEach(this.children, (child) => {

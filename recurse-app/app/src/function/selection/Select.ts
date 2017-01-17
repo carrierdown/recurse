@@ -19,9 +19,6 @@ export default class Select implements INode {
         this.strategy = strategy;
     }
 
-    // todo: add support for skipping rests - maybe handle by creating temp array of rests with their respective indexes so that they can be plucked out and
-    // inserted again after the select operation - however, the indexes would change...
-    // possible other method is to consolidate rest into the note itself, either using duration/interval or some additional param
     public generate(context: IContext): Array<IRecurseValue> {
         var results: Array<IRecurseValue> = [],
             params: Array<number> = [];

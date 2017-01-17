@@ -60,7 +60,7 @@ tape('Testing compiler with valid code', (test) => {
                 for (let x = 0; x < expectedResults.notes.length; x++) {
                     let expectedResult = expectedResults.notes[x];
                     let compiledResult = compile.result[i].notes[x];
-                    console.log(compile.result[i], expectedResult);
+                    //console.log(compile.result[i], expectedResult);
                     for (let propertyToTest of propertiesToTest) {
                         if (expectedResult[propertyToTest]) {
                             test.equal(expectedResult[propertyToTest], compiledResult[propertyToTest], `Property ${propertyToTest} of expected output (${expectedResult[propertyToTest]}) and actual output (${compiledResult[propertyToTest]}) should be the same (${filename})`);
@@ -71,7 +71,7 @@ tape('Testing compiler with valid code', (test) => {
         }
     }, () => {
         test.end();
-    }/*, 'patternLengthVisibleInOutput.rse'*/);
+    }/*, 'pitch.rse'*/);
 });
 
 
