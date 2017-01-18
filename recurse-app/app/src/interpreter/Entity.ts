@@ -20,6 +20,7 @@ enum Entity {
     ODD,
     PATTERN_LENGTH,
     PITCH,
+    PITCH_PLUS,
     PITCH_OFFSET,
     RANGE,
     RANGE_SHORTHAND,

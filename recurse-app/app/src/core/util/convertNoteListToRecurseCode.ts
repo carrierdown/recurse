@@ -111,7 +111,7 @@ export function convertNoteListToRecurseCode(noteList: INote[], clipLength: numb
             }
         }
         if (totalLength > 0) {
-            rmOutput += `,_${totalLength}`;
+            rmOutput += ` _${totalLength}`;
         }
         output += `rm(${rmOutput}) `;
 

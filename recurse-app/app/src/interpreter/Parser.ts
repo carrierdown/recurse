@@ -105,6 +105,7 @@ export default class Parser {
             case Entity.NS: return new NoteSet(parent, children);
             case Entity.ODD: return new Select(parent, SelectStrategy.odd);
             case Entity.PITCH: return new Pitch(parent, children);
+            case Entity.PITCH_PLUS: return new Pitch(parent, children, true);
             case Entity.PITCH_OFFSET: return new Value(value, parent, ValueType.PITCH_OFFSET);
             case Entity.RANGE: return new Range(parent, false);
             case Entity.RANGE_SHORTHAND: return new Range(parent, true);
@@ -154,6 +155,8 @@ export default class Parser {
                 return Entity.PATTERN_LENGTH;
             case 'pitch':
                 return Entity.PITCH;
+            case '+pitch':
+                return Entity.PITCH_PLUS;
             case 'rng':
             case 'range':
                 return Entity.RANGE;

@@ -11,7 +11,7 @@ export default class Lexer {
 
     private operatorTable: any = {
         '\\': TokenType.BACKSLASH,
-        '+': TokenType.PLUS,
+        // '+': TokenType.PLUS,
         '-': TokenType.MINUS,
         '*': TokenType.MULTIPLY,
         '.': TokenType.PERIOD,
@@ -131,7 +131,7 @@ export default class Lexer {
     static isAlpha(c): boolean {
         return (c >= 'a' && c <= 'z') ||
             (c >= 'A' && c <= 'Z') ||
-            c === '_' || c === '$';
+            c === '_' || c === '$' || c === '+';
     }
 
     static isNote(c1, c2): boolean {
@@ -140,12 +140,12 @@ export default class Lexer {
             ((c2 >= '0' && c2 <= '9') || c2 === '#' || c2 === '-');
     }
 
-    static isAlphaNumeric(c): boolean {
+/*    static isAlphaNumeric(c): boolean {
         return (c >= 'a' && c <= 'z') ||
             (c >= 'A' && c <= 'Z') ||
             (c >= '0' && c <= '9') ||
             c === '_' || c === '$';
-    }
+    }*/
 
     static isNoteCharacter(c): boolean {
         return (c >= 'a' && c <= 'g') ||
@@ -213,7 +213,7 @@ export default class Lexer {
     private processIdentifier(): IToken {
         var endpos = this.position + 1;
         while (endpos < this.bufferLength &&
-        Lexer.isAlphaNumeric(this.buffer.charAt(endpos))) {
+        Lexer.isAlpha(this.buffer.charAt(endpos))) {
             endpos++;
         }
 

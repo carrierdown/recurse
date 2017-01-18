@@ -13,7 +13,7 @@ export default class Pitch implements INode {
     public parent: INode;
     private plusMode: boolean;
 
-    constructor(parent: INode = null, children: Array<INode> = [], plusMode = true) {
+    constructor(parent: INode = null, children: Array<INode> = [], plusMode = false) {
         this.parent = parent;
         this.children = children;
         this.plusMode = plusMode;
