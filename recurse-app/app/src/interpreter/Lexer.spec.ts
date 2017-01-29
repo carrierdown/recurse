@@ -87,3 +87,25 @@ tape('handle decimal numbers properly', (test) => {
     }
     test.end();
 });
+
+tape('handle negative numbers properly', (test) => {
+    var input: string = "rm(4 -4 -1 0)",
+        lexer: Lexer = new Lexer(),
+        expectedTokens: TokenType[] = [
+            TokenType.IDENTIFIER,
+            TokenType.LEFT_PAREN,
+            TokenType.NUMBER,
+            TokenType.NUMBER,
+            TokenType.NUMBER,
+            TokenType.NUMBER,
+            TokenType.RIGHT_PAREN
+        ],
+        token: IToken,
+        i: number = 0;
+    lexer.setBuffer(input);
+    while (token = lexer.token()) {
+        test.equal(token.type, expectedTokens[i], `Token with value ${token.value} should translate to ${TokenType[expectedTokens[i]]}`);
+        i++;
+    }
+    test.end();
+});

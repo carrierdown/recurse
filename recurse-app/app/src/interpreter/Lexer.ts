@@ -12,7 +12,7 @@ export default class Lexer {
     private operatorTable: any = {
         '\\': TokenType.BACKSLASH,
         // '+': TokenType.PLUS,
-        '-': TokenType.MINUS,
+        //'-': TokenType.MINUS,
         '*': TokenType.MULTIPLY,
         '.': TokenType.PERIOD,
         ':': TokenType.COLON,
@@ -109,7 +109,7 @@ export default class Lexer {
                     if (char === '_') {
                         return {type: TokenType.UNDERSCORE, value: char, pos: this.position++};
                     }
-                } else if (Lexer.isDigit(char)) {
+                } else if (Lexer.isDigit(char) || char === '-') {
                     return this.processNumber();
                 } else if (char === '"') {
                     return this.processQuote();
