@@ -109,3 +109,27 @@ tape('handle negative numbers properly', (test) => {
     }
     test.end();
 });
+
+tape('handle comments properly', (test) => {
+    var input: string = `// hei
+            //hoppsan sveisann
+            rm(16 48)//ekstrahopp
+            //en siste topp
+            `,
+        lexer: Lexer = new Lexer(),
+        expectedTokens: TokenType[] = [
+            TokenType.IDENTIFIER,
+            TokenType.LEFT_PAREN,
+            TokenType.NUMBER,
+            TokenType.NUMBER,
+            TokenType.RIGHT_PAREN
+        ],
+        token: IToken,
+        i: number = 0;
+    lexer.setBuffer(input);
+    while (token = lexer.token()) {
+        test.equal(token.type, expectedTokens[i], `Token with value ${token.value} should translate to ${TokenType[expectedTokens[i]]}`);
+        i++;
+    }
+    test.end();
+});

@@ -67,6 +67,14 @@ export default class Lexer {
     // an error throws Error.
 
     token(): IToken {
+        let token;
+        do {
+            token = this.nextToken();
+        } while (token !== null && token.type === TokenType.COMMENT);
+        return token;
+    }
+
+    nextToken(): IToken {
         this.skipNonTokens();
         if (this.position >= this.bufferLength) {
             return null;
@@ -79,12 +87,11 @@ export default class Lexer {
         // another '/'. If not followed by another '/', it's the DIVIDE
         // operator.
         var nextChar = this.buffer.charAt(this.position + 1);
-        if (char === '/') {
-            if (nextChar === '/') {
-                return this.processComment();
-            } else {
-                return {type: TokenType.DIVIDE, value: '/', pos: this.position++};
-            }
+
+        if (char === '/' && nextChar === '/') {
+            return this.processComment();
+        } else if (char === '/') {
+            return {type: TokenType.DIVIDE, value: '/', pos: this.position++};
         } else if (char === ';' && nextChar === ';') {
             return {type: TokenType.DOUBLE_SEMI, value: ';;', pos: this.position += 2};
         } else if (char === '.' && nextChar === '.') {
@@ -114,7 +121,7 @@ export default class Lexer {
                 } else if (char === '"') {
                     return this.processQuote();
                 } else {
-                    throw Error('Token error at ' + this.position);
+                    throw Error('Token error at ' + this.position + ' ' + this.buffer.charAt(this.position));
                 }
             }
         }
