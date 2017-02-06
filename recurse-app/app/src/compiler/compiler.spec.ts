@@ -71,7 +71,7 @@ tape('Testing compiler with valid code', (test) => {
         }
     }, () => {
         test.end();
-    }/*, 'pitchPlus.rse'*/);
+    }, 'pitchPlus.rse');
 });
 
 
