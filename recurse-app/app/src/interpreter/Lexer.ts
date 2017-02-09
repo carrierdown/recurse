@@ -90,41 +90,57 @@ export default class Lexer {
 
         if (char === '/' && nextChar === '/') {
             return this.processComment();
-        } else if (char === '/') {
+        }
+        if (char === '/') {
             return {type: TokenType.DIVIDE, value: '/', pos: this.position++};
-        } else if (char === ';' && nextChar === ';') {
+        }
+        if (char === ';' && nextChar === ';') {
             return {type: TokenType.DOUBLE_SEMI, value: ';;', pos: this.position += 2};
-        } else if (char === '.' && nextChar === '.') {
+        }
+        if (char === '.' && nextChar === '.') {
             return {type: TokenType.DOUBLE_PERIOD, value: '..', pos: this.position += 2};
-        } else {
-            // Look it up in the table of operators
-            var op = this.operatorTable[char];
-            // special case: x can also be part of an identifier, but if alone it is the repeat token
-            if (op !== undefined) {
-                return {type: op, value: char, pos: this.position++};
-            } else {
-                // Not an operator - so it's the beginning of another token.
-                if (Lexer.isNote(char, nextChar)) {
-                    return this.processNote();
-                } else if (Lexer.isAlpha(char) && Lexer.isAlpha(nextChar)) { // note that this makes one-letter identifiers impossible unless specifically detected below
-                    return this.processIdentifier();
-                } else if (Lexer.isAlpha(char)) {
-                    // check for one-letter alphabetic tokens (a-z, A-Z, _, $)
-                    if (char === 'x') {
-                        return {type: TokenType.REPEAT, value: char, pos: this.position++};
-                    }
-                    if (char === '_') {
-                        return {type: TokenType.UNDERSCORE, value: char, pos: this.position++};
-                    }
-                } else if (Lexer.isDigit(char) || char === '-') {
-                    return this.processNumber();
-                } else if (char === '"') {
-                    return this.processQuote();
-                } else {
-                    throw Error('Token error at ' + this.position + ' ' + this.buffer.charAt(this.position));
-                }
+        }
+        // Look it up in the table of operators
+        var op = this.operatorTable[char];
+        // special case: x can also be part of an identifier, but if alone it is the repeat token
+        if (op !== undefined) {
+            let token:IToken = {
+                type: op, value: char, pos: this.position, isolatedLeft: (this.getChar(this.position - 1) === ' '),
+                isolatedRight: (this.getChar(this.position + 1) === ' ')
+            };
+            this.position++;
+            return token;
+        }
+        // Not an operator - so it's the beginning of another token.
+        if (Lexer.isNote(char, nextChar)) {
+            return this.processNote();
+        }
+        if (Lexer.isAlpha(char) && Lexer.isAlpha(nextChar)) { // note that this makes one-letter identifiers impossible unless specifically detected below
+            return this.processIdentifier();
+        }
+        if (Lexer.isAlpha(char)) {
+            // check for one-letter alphabetic tokens (a-z, A-Z, _, $)
+            if (char === 'x') {
+                return {type: TokenType.REPEAT, value: char, pos: this.position++};
+            }
+            if (char === '_') {
+                return {type: TokenType.UNDERSCORE, value: char, pos: this.position++};
             }
         }
+        if (Lexer.isDigit(char) || char === '-') {
+            return this.processNumber();
+        }
+        if (char === '"') {
+            return this.processQuote();
+        }
+        throw Error('Token error at ' + this.position + ' ' + this.buffer.charAt(this.position));
+    }
+
+    private getChar(pos): string {
+        if (pos >= 0 && pos < this.buffer.length) {
+            return this.buffer.charAt(pos);
+        }
+        return "";
     }
 
     static isNewline(c): boolean {

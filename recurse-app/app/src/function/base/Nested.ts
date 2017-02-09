@@ -14,12 +14,14 @@ export default class Nested implements INode {
     public children: INode[];
     public parent: INode;
     public associatedNodes: INode[];
+    public head: INode;
 
-    constructor(value: number = -1, parent: INode = null) {
+    constructor(value: number = -1, parent: INode = null, head: INode = null) {
         this.value = value;
         this.parent = parent;
         this.children = [];
         this.associatedNodes = [];
+        this.head = head;
     }
 
     public generate(context: IContext): Array<IRecurseValue> {
@@ -67,14 +69,18 @@ export default class Nested implements INode {
          }
         */
 
-        if (results.length > 0 && results[0].valueType === ValueType.INTERVAL || results[0].valueType === ValueType.REST) {
-            let sum: number = 0;
-            for (let result of results) {
-                sum += result.value;
-            }
+        let scaleValues: boolean = (this.value > 0);
 
-            for (let i = 0; i < results.length; i++) {
-                results[i].value = (results[i].value / sum) * this.value;
+        if (results.length > 0 && results[0].valueType === ValueType.INTERVAL || results[0].valueType === ValueType.REST) {
+            if (scaleValues) {
+                let sum: number = 0;
+                for (let result of results) {
+                    sum += result.value;
+                }
+
+                for (let i = 0; i < results.length; i++) {
+                    results[i].value = (results[i].value / sum) * this.value;
+                }
             }
 
             for (let associatedNode of this.associatedNodes) {

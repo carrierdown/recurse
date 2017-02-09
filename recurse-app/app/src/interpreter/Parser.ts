@@ -317,7 +317,11 @@ export default class Parser {
                         current.children.push(Parser.createNode(entityType, current, tokenSet[i].value));
                     } else if (nextToken.type === TokenType.LEFT_PAREN) {
                         // this is a nested statement
-                        current.children.push(Parser.createNode(Entity.NESTED, current, tokenSet[i].value));
+                        console.log(nextToken, tokenSet[i].value);
+                        if (nextToken.isolatedLeft) {
+                            current.children.push(Parser.createNode(entityType, current, tokenSet[i].value));
+                        }
+                        current.children.push(Parser.createNode(Entity.NESTED, current, nextToken.isolatedLeft ? -1 : tokenSet[i].value));
                     }
                     break;
                 case TokenType.UNDERSCORE:
