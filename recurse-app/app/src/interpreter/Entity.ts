@@ -9,6 +9,7 @@ enum Entity {
     EVENT_RESOLUTION,
     FILL,
     FIRST,
+    GENERIC_OPERATOR,
     INTERPOLATE,
     INTERVAL,
     INVALID,

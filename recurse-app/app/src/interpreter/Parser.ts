@@ -34,6 +34,7 @@ import Loop from "../function/setter/Loop";
 import Pitch from "../function/modifier/Pitch";
 import Range from "../function/operator/Range";
 import VelocitySet from "../function/generator/VelocitySet";
+import {GenericOperator} from "../function/operator/GenericOperator";
 
 export default class Parser {
     public static get SHORTHAND_TOKENS(): Array<TokenType> {
@@ -188,6 +189,7 @@ export default class Parser {
                 return Entity.VEL;
             default:
                 console.log('couldn\'t find identifier...');
+                return Entity.INVALID;
         }
     }
 
@@ -270,10 +272,19 @@ export default class Parser {
                     } else {
                         entityType = Entity.NOTE;
                     }
-
-                    if (Parser.isTerminatingToken(nextToken.type)) {
+                    current.children.push(Parser.createNode(entityType, current, tokenSet[i].value));
+                    break;
+                case TokenType.SINGLE_QUOTE:
+                    current.children.push(new GenericOperator(tokenSet[i].type));
+                    break;
+                case TokenType.RIGHT_ANGLE:
+                    break;
+                case TokenType.REPEAT:
+                    break;
+                case TokenType.DOUBLE_PERIOD:
+                    break;
+/*                    if (Parser.isTerminatingToken(nextToken.type)) {
                         // this is a simple value param
-                        current.children.push(Parser.createNode(entityType, current, tokenSet[i].value));
                     } else if (nextToken.type === TokenType.SINGLE_QUOTE) {
                         // this is a shorthand alternating statement
                         if (current.type !== Entity.ALT_SHORTHAND) {
@@ -323,7 +334,7 @@ export default class Parser {
                         }
                         current.children.push(Parser.createNode(Entity.NESTED, current, nextToken.isolatedLeft ? -1 : tokenSet[i].value));
                     }
-                    break;
+                    break;*/
                 case TokenType.UNDERSCORE:
                     if (nextToken.type === TokenType.NUMBER) {
                         // this is a rest statement
@@ -352,13 +363,22 @@ export default class Parser {
                     // further items encountered (typically numbers) are pushed onto the children of rm
                     // In other words, l_paren and r_paren don't modify anything, they simply move current to point to a newly created item,
                     // or moving the pointer out from the newly created item
-
-                    //console.log('l_paren', current, current.parent);
-                    if (Parser.hasChildren(current)) {
-                        current = _.last(current.children);
+                    let lastChild = void 0;
+                    if (current.children.length > 0) {
+                        lastChild = current.children[current.children.length - 1];
                     } else {
                         console.log('parse error - no children on current node');
                     }
+                    if (lastChild && lastChild.type === Entity.VALUE) {
+                        // nested statement with/without head value
+                        current.children[current.children.length - 1] = Parser.createNode(Entity.NESTED, current, tokenSet[i].isolatedLeft ? -1 : lastChild.value);
+                        break;
+                    }
+                    // todo: sort of hacky way to figure out if entity is an identifier - maybe include original token as part of Node
+                    if (lastChild && Parser.recurseEntityFromIdentifier(Entity[lastChild.type]) !== Entity.INVALID) {
+                        current = _.last(current.children);
+                    }
+                    //console.log('l_paren', current, current.parent);
                     //console.log('l_paren', current, current.parent);
                     break;
                 case TokenType.RIGHT_PAREN:
@@ -412,8 +432,6 @@ export default class Parser {
                         current.children.push(Parser.createNode(entity, current));
                     }
                     break;
-                case TokenType.REPEAT:
-                    break;
                 default:
                     // probably throw error here
                     console.log('reached default...', TokenType[tokenSet[i].type]);
@@ -422,6 +440,8 @@ export default class Parser {
         result.result = syntaxTree;
         return result;
     }
+
+    // after parsing, we do a second phase where operators and nested blocks (head value or no) are resolved
 
     private static inferGenericValueArgument(node: INode): Entity {
         if (!node) {
