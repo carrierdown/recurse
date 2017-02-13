@@ -14,7 +14,8 @@
     ]
   },
   "scripts": {
-    "test": "grunt ts && tape compiled-scripts/**/*.spec.js | tap-spec && tape compiled-scripts/**/**/*.spec.js | tap-spec"
+    "test": "grunt ts && tape compiled-scripts/**/*.spec.js | tap-spec && tape compiled-scripts/**/**/*.spec.js | tap-spec",
+    "parsertest": "grunt ts && tape compiled-scripts/interpreter/Parser.spec.js | tap-spec"
   },
   "author": "",
   "license": "ISC",

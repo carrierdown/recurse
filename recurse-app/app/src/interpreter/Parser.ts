@@ -259,6 +259,7 @@ export default class Parser {
             let entityType;
 
             switch (tokenSet[i].type) {
+                /* --- LITERALS --- */
                 case TokenType.NUMBER:
                 case TokenType.NOTE:
                     if (tokenSet[i].type === TokenType.NUMBER) {
@@ -274,14 +275,12 @@ export default class Parser {
                     }
                     current.children.push(Parser.createNode(entityType, current, tokenSet[i].value));
                     break;
+                /* --- OPERATORS --- */
                 case TokenType.SINGLE_QUOTE:
-                    current.children.push(new GenericOperator(tokenSet[i].type));
-                    break;
                 case TokenType.RIGHT_ANGLE:
-                    break;
                 case TokenType.REPEAT:
-                    break;
                 case TokenType.DOUBLE_PERIOD:
+                    current.children.push(new GenericOperator(tokenSet[i].type));
                     break;
 /*                    if (Parser.isTerminatingToken(nextToken.type)) {
                         // this is a simple value param
@@ -335,6 +334,8 @@ export default class Parser {
                         current.children.push(Parser.createNode(Entity.NESTED, current, nextToken.isolatedLeft ? -1 : tokenSet[i].value));
                     }
                     break;*/
+
+                /* --- PUNCTUATION --- */
                 case TokenType.UNDERSCORE:
                     if (nextToken.type === TokenType.NUMBER) {
                         // this is a rest statement
@@ -371,11 +372,14 @@ export default class Parser {
                     }
                     if (lastChild && lastChild.type === Entity.VALUE) {
                         // nested statement with/without head value
-                        current.children[current.children.length - 1] = Parser.createNode(Entity.NESTED, current, tokenSet[i].isolatedLeft ? -1 : lastChild.value);
+                        if (tokenSet[i].isolatedLeft) {
+                            current.children.push(Parser.createNode(Entity.NESTED, current, -1));
+                        } else {
+                            current.children[current.children.length - 1] = Parser.createNode(Entity.NESTED, current, lastChild.value);
+                        }
                         break;
                     }
-                    // todo: sort of hacky way to figure out if entity is an identifier - maybe include original token as part of Node
-                    if (lastChild && Parser.recurseEntityFromIdentifier(Entity[lastChild.type]) !== Entity.INVALID) {
+                    if (lastChild && lastChild.type > Entity.KEYWORDS_BEGIN && lastChild.type < Entity.KEYWORDS_END) {
                         current = _.last(current.children);
                     }
                     //console.log('l_paren', current, current.parent);
@@ -413,6 +417,7 @@ export default class Parser {
                     syntaxTree.rootNodes.push(newClipRoot);
                     current = Parser.addNodeToChildrenAndRetrieve(newClipRoot, Entity.CHAIN);
                     break;
+                /* --- KEYWORDS --- */
                 case TokenType.IDENTIFIER:
                     let entity = Parser.recurseEntityFromIdentifier(tokenSet[i].value);
                     if (entity === Entity.INVALID) {
@@ -441,7 +446,7 @@ export default class Parser {
         return result;
     }
 
-    // after parsing, we do a second phase where operators and nested blocks (head value or no) are resolved
+    // after parsing, we do a second phase where operators are resolved
 
     private static inferGenericValueArgument(node: INode): Entity {
         if (!node) {

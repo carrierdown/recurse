@@ -69,10 +69,10 @@ export default class Nested implements INode {
          }
         */
 
-        let scaleValues: boolean = (this.value > 0);
+        let doScaleValues: boolean = (this.value > 0);
 
         if (results.length > 0 && results[0].valueType === ValueType.INTERVAL || results[0].valueType === ValueType.REST) {
-            if (scaleValues) {
+            if (doScaleValues) {
                 let sum: number = 0;
                 for (let result of results) {
                     sum += result.value;

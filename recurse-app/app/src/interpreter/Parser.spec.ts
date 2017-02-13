@@ -9,6 +9,7 @@ import RecurseResult from "../core/type/RecurseResult";
 import ISyntaxTree from "./ISyntaxTree";
 import INode from "./INode";
 import ValueType from "./ValueType";
+import SyntaxTree from "../function/SyntaxTree";
 
 function getSyntaxTreeEntities(nodes: INode[], entities: Entity[] = []): Entity[] {
     for (let node of nodes) {
@@ -20,7 +21,8 @@ function getSyntaxTreeEntities(nodes: INode[], entities: Entity[] = []): Entity[
 
 function parseAndCheckAgainst(input: string, expectedEntities: Entity[], test) {
     var lexer:Lexer = new Lexer(),
-        parsed:RecurseResult<ISyntaxTree> = Parser.parseTokensToSyntaxTree(lexer.getTokenSet(input));
+        parsed:RecurseResult<SyntaxTree> = Parser.parseTokensToSyntaxTree(lexer.getTokenSet(input));
+    Parser.printSyntaxTree(parsed.result);
 
     if (!parsed.isOk()) {
         test.fail(parsed.error);
@@ -44,6 +46,10 @@ function parseAndCheckAgainst(input: string, expectedEntities: Entity[], test) {
 // todo: in front of LEFT_PAREN, since this is the only case where we are interested in capturing a space. We could then assign a special token value for such instances, e.g. ISOLATED_LEFT_PAREN.
 tape('Parser should handle anonymous nested blocks', (test) => {
     parseAndCheckAgainst("rm(1 (2 4)) ns(c4 (c5 c6))", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.VALUE, Entity.NESTED, Entity.VALUE, Entity.VALUE, Entity.NS, Entity.VALUE, Entity.NESTED, Entity.VALUE, Entity.VALUE], test);
+});
+
+tape('Parser should handle nested blocks', (test) => {
+    parseAndCheckAgainst("rm(1(2 4)) ns(c4(c5 c6))", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.NESTED, Entity.VALUE, Entity.VALUE, Entity.NS, Entity.NESTED, Entity.VALUE, Entity.VALUE], test);
 });
 
 // todo: Nested should contain a sub node so that it supports more complex values than simply numbers which is the case today. This means an interpolate statement could be the sum of a nested expr.
