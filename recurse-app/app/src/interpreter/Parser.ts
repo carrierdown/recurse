@@ -35,6 +35,7 @@ import Pitch from "../function/modifier/Pitch";
 import Range from "../function/operator/Range";
 import VelocitySet from "../function/generator/VelocitySet";
 import {GenericOperator} from "../function/operator/GenericOperator";
+import Helpers from "../core/util/Helpers";
 
 export default class Parser {
     public static get SHORTHAND_TOKENS(): Array<TokenType> {
@@ -208,7 +209,7 @@ export default class Parser {
         return parenLevel === 0;
     }
 
-    public static addNodeToChildrenAndRetrieve(node: INode, nodeTypeToAdd: Entity): INode {
+    public static createAndAddNodeToChildrenAndRetrieve(node: INode, nodeTypeToAdd: Entity): INode {
         node.children.push(Parser.createNode(nodeTypeToAdd, node));
         return node.children[node.children.length - 1];
     }
@@ -226,6 +227,7 @@ export default class Parser {
         }
     }
 
+    // todo: remove RecurseResult stuff and use exceptions instead
     public static parseTokensToSyntaxTree(tokenSet: Array<IToken>): RecurseResult<ISyntaxTree> {
         var current: INode = Parser.createNode(Entity.ROOT, null),
             syntaxTree: ISyntaxTree = new SyntaxTree(),
@@ -240,7 +242,7 @@ export default class Parser {
         Parser.preProcessTokens(tokenSet);
 
         syntaxTree.rootNodes[0] = current;
-        current = Parser.addNodeToChildrenAndRetrieve(current, Entity.CHAIN);
+        current = Parser.createAndAddNodeToChildrenAndRetrieve(current, Entity.CHAIN);
 
         for (let i = 0; i < tokenSet.length; i++) {
             let nextToken = Parser.tokenSetLookAhead(tokenSet, i, 1);
@@ -370,23 +372,29 @@ export default class Parser {
                     } else {
                         console.log('parse error - no children on current node');
                     }
-                    if (lastChild && lastChild.type === Entity.VALUE) {
+                    if (lastChild && (lastChild.type === Entity.VALUE)) {
                         // nested statement with/without head value
                         if (tokenSet[i].isolatedLeft) {
                             current.children.push(Parser.createNode(Entity.NESTED, current, -1));
                         } else {
                             current.children[current.children.length - 1] = Parser.createNode(Entity.NESTED, current, lastChild.value);
                         }
+                        current = _.last(current.children);
                         break;
                     }
-                    if (lastChild && lastChild.type > Entity.KEYWORDS_BEGIN && lastChild.type < Entity.KEYWORDS_END) {
+                    if (lastChild && lastChild.type === Entity.GENERIC_OPERATOR) {
+                        current.children.push(Parser.createNode(Entity.NESTED, current, -1));
+                        current = _.last(current.children);
+                        break;
+                    }
+                    if (lastChild && lastChild.type > Entity._KEYWORDS_BEGIN && lastChild.type < Entity._KEYWORDS_END) {
                         current = _.last(current.children);
                     }
                     //console.log('l_paren', current, current.parent);
                     //console.log('l_paren', current, current.parent);
                     break;
                 case TokenType.RIGHT_PAREN:
-                    current = Parser.exitShorthandStatements(current);
+                    // current = Parser.exitShorthandStatements(current);
                     // no children on current node is not necessarily an error (could be an empty func())
                     current = current.parent;
                     break;
@@ -395,27 +403,27 @@ export default class Parser {
                     //if (current.type === Entity.CHAIN) {
                     //    current = current.parent;
                     //}
-                    current = Parser.exitShorthandStatements(current);
+                    // current = Parser.exitShorthandStatements(current);
                     break;
                 case TokenType.PIPE: // experimental: | now signifies what ; used to mean earlier
                     if (current.type !== Entity.CHAIN) {
                         return result.setError(ErrorMessages.getError(ErrorMessages.NOT_IN_CHAIN));
                     }
                     console.log('here');
-                    current = Parser.addNodeToChildrenAndRetrieve(current.parent, Entity.CHAIN);
+                    current = Parser.createAndAddNodeToChildrenAndRetrieve(current.parent, Entity.CHAIN);
                     console.log('and there');
                     break;
                 case TokenType.SEMI:
                     // creates new track
                     let newTrackRoot: INode = Parser.createNode(Entity.ROOT, null, false);
                     syntaxTree.rootNodes.push(newTrackRoot);
-                    current = Parser.addNodeToChildrenAndRetrieve(newTrackRoot, Entity.CHAIN);
+                    current = Parser.createAndAddNodeToChildrenAndRetrieve(newTrackRoot, Entity.CHAIN);
                     break;
                 case TokenType.DOUBLE_SEMI:
                     // creates a new clip
                     let newClipRoot: INode = Parser.createNode(Entity.ROOT, null, true);
                     syntaxTree.rootNodes.push(newClipRoot);
-                    current = Parser.addNodeToChildrenAndRetrieve(newClipRoot, Entity.CHAIN);
+                    current = Parser.createAndAddNodeToChildrenAndRetrieve(newClipRoot, Entity.CHAIN);
                     break;
                 /* --- KEYWORDS --- */
                 case TokenType.IDENTIFIER:
@@ -442,11 +450,48 @@ export default class Parser {
                     console.log('reached default...', TokenType[tokenSet[i].type]);
             }
         }
+
+        function walkChildren(node: INode) {
+            console.log("Walking node", Entity[node.type]);
+            let containsGenericOp = false;
+            for (let childNode of node.children) {
+                if (childNode.type === Entity.GENERIC_OPERATOR) {
+                    containsGenericOp = true;
+                    break;
+                }
+            }
+            for (let i = 0; i < node.children.length; i++) {
+                if (node.children[i].type === Entity.GENERIC_OPERATOR && node.children[i].chomp && i > 0 && i < node.children.length - 1) {
+                    let newNode: INode = node.children[i].chomp(node.children[i - 1], node.children[i + 1]);
+                    i = i - 1;
+                    node.children.splice(i, 3, newNode);
+                } else {
+                    // console.log('Error during chomping');
+                }
+                walkChildren(node.children[i]);
+            }
+/*
+            if (containsGenericOp) {
+                if (node.children.length >= 3) {
+                    walkChildren(node.children[0]);
+                    walkChildren(node.children[node.children.length - 1]);
+                } else {
+                    console.log("At least three parameters needed when operator is used");
+                }
+            }
+*/
+        }
+
+        // after parsing, we do a second phase where operators are resolved
+        for (let node of syntaxTree.rootNodes) {
+            walkChildren(node);
+        }
+
+        Parser.printSyntaxTree(syntaxTree);
+
         result.result = syntaxTree;
         return result;
     }
-
-    // after parsing, we do a second phase where operators are resolved
 
     private static inferGenericValueArgument(node: INode): Entity {
         if (!node) {
@@ -547,9 +592,6 @@ export default class Parser {
             parent = '',
             value = '';
 
-        if (node.parent !== null) {
-            parent = Entity[node.parent.type];
-        }
         if (node['value'] !== undefined) {
             value = node['value'];
         }

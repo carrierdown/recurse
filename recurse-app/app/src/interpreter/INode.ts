@@ -14,6 +14,7 @@ interface INode {
     startOffset?: number;
     reset?: () => void;
     settings?: Array<ISetting>;
+    chomp?: (node1: INode, node2: INode) => INode;
 }
 
 export default INode;
