@@ -370,7 +370,10 @@ export default class Parser {
                     if (current.children.length > 0) {
                         lastChild = current.children[current.children.length - 1];
                     } else {
-                        console.log('parse error - no children on current node');
+                        // If we get here then it probably means we have just encountered a left parenthesis and encountered one more immediately. Create a new nested anonymous block.
+                        current.children.push(Parser.createNode(Entity.NESTED, current, -1));
+                        current = _.last(current.children);
+                        break;
                     }
                     if (lastChild && (lastChild.type === Entity.VALUE)) {
                         // nested statement with/without head value
@@ -452,7 +455,7 @@ export default class Parser {
         }
 
         function walkChildren(node: INode) {
-            console.log("Walking node", Entity[node.type]);
+            //console.log("Walking node", Entity[node.type]);
             let containsGenericOp = false;
             for (let childNode of node.children) {
                 if (childNode.type === Entity.GENERIC_OPERATOR) {
@@ -461,8 +464,9 @@ export default class Parser {
                 }
             }
             for (let i = 0; i < node.children.length; i++) {
-                if (node.children[i].type === Entity.GENERIC_OPERATOR && node.children[i].chomp && i > 0 && i < node.children.length - 1) {
-                    let newNode: INode = node.children[i].chomp(node.children[i - 1], node.children[i + 1]);
+                if (node.children[i].type === Entity.GENERIC_OPERATOR && i > 0 && i < node.children.length - 1) {
+                    //console.log("Transforming generic operator");
+                    let newNode: INode = node.children[i].transform(node, node.children[i - 1], node.children[i + 1]);
                     i = i - 1;
                     node.children.splice(i, 3, newNode);
                 } else {

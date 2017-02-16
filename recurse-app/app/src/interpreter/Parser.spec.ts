@@ -1,4 +1,5 @@
 import tape = require('tape');
+import _ = require('lodash');
 
 import Lexer from "./Lexer";
 import IToken from "./IToken";
@@ -33,10 +34,8 @@ function parseAndCheckAgainst(input: string, expectedEntities: Entity[], test) {
     getSyntaxTreeEntities(parsed.result.rootNodes, entities);
 
     for (let i = 0; i < expectedEntities.length; i++) {
-        console.log(Entity[entities[i]]);
-        test.equal(entities[i], expectedEntities[i], `Entity ${Entity[entities[i]]} should be equal to ${Entity[expectedEntities[i]]}`);
+        test.equal(entities[i], expectedEntities[i], `Entity ${Entity[entities[i]]}${_.repeat("_", 20 - Entity[entities[i]].length)} should be equal to ${Entity[expectedEntities[i]]}`);
     }
-    test.end();
 }
 
 // consider doing validation after syntax tree has been created (basic syntax checking still needs to be done by parser)
@@ -44,14 +43,18 @@ function parseAndCheckAgainst(input: string, expectedEntities: Entity[], test) {
 
 tape('Parser should handle anonymous nested blocks', (test) => {
     parseAndCheckAgainst("rm(1 (2 4)) ns(c4 (c5 c6))", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.VALUE, Entity.NESTED, Entity.VALUE, Entity.VALUE, Entity.NS, Entity.VALUE, Entity.NESTED, Entity.VALUE, Entity.VALUE], test);
+    test.end();
 });
 
 tape('Parser should handle nested blocks', (test) => {
     parseAndCheckAgainst("rm(1(2 4)) ns(c4(c5 c6))", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.NESTED, Entity.VALUE, Entity.VALUE, Entity.NS, Entity.NESTED, Entity.VALUE, Entity.VALUE], test);
+    test.end();
 });
 
 tape('Should be possible to do a repeat with an anonymous nested block', (test) => {
-    parseAndCheckAgainst("rm(3x(2 4))", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.VALUE, Entity.NESTED, Entity.VALUE, Entity.VALUE], test);
+    parseAndCheckAgainst("rm(3x(2 4))", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.REPEAT_SHORTHAND, Entity.VALUE, Entity.NESTED], test);
+    parseAndCheckAgainst("rm((2 4)x3)", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.REPEAT_SHORTHAND, Entity.NESTED, Entity.VALUE], test);
+    test.end();
 });
 
 // todo: Nested should contain a sub node so that it supports more complex values than simply numbers which is the case today. This means an interpolate statement could be the sum of a nested expr.

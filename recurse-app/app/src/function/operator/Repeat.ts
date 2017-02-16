@@ -30,9 +30,9 @@ export default class Repeat implements INode {
         return results;
     }
 
-    public chomp(node1: INode, node2: INode): INode {
+/*    public chomp(node1: INode, node2: INode): INode {
         console.log("chomping triggered for repeat");
         this.children = [node1, node2];
         return this;
-    }
+    }*/
 }

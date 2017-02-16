@@ -39,6 +39,7 @@ export enum TokenType {
     UNDERSCORE
 }
 
+// todo: this will get trickier and trickier to maintain as complexity increases. Remove this and replace with per node validation instead (each node validates its contents).
 var expects = [
     {
         token: TokenType.START,
@@ -66,15 +67,15 @@ var expects = [
     },
     {
         token: TokenType.LEFT_PAREN,
-        expects: [TokenType.NUMBER, TokenType.NOTE, TokenType.IDENTIFIER, TokenType.UNDERSCORE, TokenType.MULTIPLY]
+        expects: [TokenType.NUMBER, TokenType.NOTE, TokenType.IDENTIFIER, TokenType.UNDERSCORE, TokenType.MULTIPLY, TokenType.LEFT_PAREN]
     },
     {
         token: TokenType.RIGHT_PAREN,
-        expects: [TokenType.IDENTIFIER, TokenType.RIGHT_PAREN, TokenType.COMMA, TokenType.SEMI, TokenType.DOUBLE_SEMI, TokenType.PIPE]
+        expects: [TokenType.IDENTIFIER, TokenType.RIGHT_PAREN, TokenType.COMMA, TokenType.SEMI, TokenType.DOUBLE_SEMI, TokenType.PIPE, TokenType.REPEAT, TokenType.RIGHT_ANGLE]
     },
     {
         token: TokenType.NUMBER,
-        expects: [TokenType.COMMA, TokenType.LEFT_PAREN, TokenType.RIGHT_PAREN, TokenType.SINGLE_QUOTE, TokenType.REPEAT, TokenType.DOUBLE_PERIOD]
+        expects: [TokenType.COMMA, TokenType.LEFT_PAREN, TokenType.RIGHT_PAREN, TokenType.SINGLE_QUOTE, TokenType.REPEAT, TokenType.DOUBLE_PERIOD, TokenType.RIGHT_ANGLE]
     },
     {
         token: TokenType.COMMA,
