@@ -57,6 +57,11 @@ tape('Should be possible to do a repeat with an anonymous nested block', (test) 
     test.end();
 });
 
+tape('Should be possible to assign a block to a variable', (test) => {
+    parseAndCheckAgainst("rm($test=(2 4)))", [Entity.ROOT, Entity.CHAIN, Entity.VARIABLE, Entity.VALUE, Entity.VALUE], test);
+    test.end();
+});
+
 // todo: Nested should contain a sub node so that it supports more complex values than simply numbers which is the case today. This means an interpolate statement could be the sum of a nested expr.
 /*
 tape('Interpolate statements should be supported as the sum of a nested block', (test) => {

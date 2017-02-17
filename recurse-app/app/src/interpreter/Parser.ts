@@ -36,6 +36,7 @@ import Range from "../function/operator/Range";
 import VelocitySet from "../function/generator/VelocitySet";
 import {GenericOperator} from "../function/operator/GenericOperator";
 import Helpers from "../core/util/Helpers";
+import VariableName from "../function/base/VariableName";
 
 export default class Parser {
     public static get SHORTHAND_TOKENS(): Array<TokenType> {
@@ -282,61 +283,9 @@ export default class Parser {
                 case TokenType.RIGHT_ANGLE:
                 case TokenType.REPEAT:
                 case TokenType.DOUBLE_PERIOD:
+                case TokenType.EQUALS:
                     current.children.push(new GenericOperator(tokenSet[i].type));
                     break;
-/*                    if (Parser.isTerminatingToken(nextToken.type)) {
-                        // this is a simple value param
-                    } else if (nextToken.type === TokenType.SINGLE_QUOTE) {
-                        // this is a shorthand alternating statement
-                        if (current.type !== Entity.ALT_SHORTHAND) {
-                            let altNode = Parser.createNode(Entity.ALT_SHORTHAND, current);
-                            current.children.push(altNode);
-                            current = altNode;
-                        }
-                        current.children.push(Parser.createNode(entityType, current, tokenSet[i].value));
-                    } else if (nextToken.type === TokenType.RIGHT_ANGLE && Parser.tokenSetLookAhead(tokenSet, i, 2).type === TokenType.NUMBER) {
-                        // this is an interpolate param
-                        let interpolateNode = Parser.createNode(Entity.INTERPOLATE, current);
-                        interpolateNode.children.push(Parser.createNode(entityType, interpolateNode, tokenSet[i].value));
-                        interpolateNode.children.push(Parser.createNode(entityType, interpolateNode, tokenSet[i + 2].value));
-                        current.children.push(interpolateNode);
-                        i += 2; // skip > and number since we have already processed it
-                    } else if (nextToken.type === TokenType.REPEAT) {
-                        // this is a shorthand repeat statement
-                        // check that were not already in a repeat or alt
-                        if ([Entity.REPEAT_SHORTHAND, Entity.ALT_SHORTHAND].indexOf(current.type) === -1) {
-                            let repNode = Parser.createNode(Entity.REPEAT_SHORTHAND, current);
-                            current.children.push(repNode);
-                            current = repNode;
-                        } else {
-                            // we're already in a repeat or alt
-                            if (current.type === Entity.REPEAT_SHORTHAND) {
-                                return result.setError(ErrorMessages.getError(ErrorMessages.REPEAT_STATEMENT_TOO_MANY_OPERANDS));
-                            } else {
-                                return result.setError(ErrorMessages.getError(ErrorMessages.REPEAT_SHORTHAND_INVALID_IN_ALT_SHORTHAND));
-                            }
-                        }
-                        current.children.push(Parser.createNode(entityType, current, tokenSet[i].value));
-                    } else if (nextToken.type === TokenType.DOUBLE_PERIOD) {
-                        // this is a shorthand range statement
-                        if ([Entity.RANGE_SHORTHAND, Entity.ALT_SHORTHAND, Entity.REPEAT_SHORTHAND].indexOf(current.type) === -1) {
-                            let rangeNode = Parser.createNode(Entity.RANGE_SHORTHAND, current);
-                            current.children.push(rangeNode);
-                            current = rangeNode;
-                        } else {
-                            // todo: error
-                        }
-                        current.children.push(Parser.createNode(entityType, current, tokenSet[i].value));
-                    } else if (nextToken.type === TokenType.LEFT_PAREN) {
-                        // this is a nested statement
-                        console.log(nextToken, tokenSet[i].value);
-                        if (nextToken.isolatedLeft) {
-                            current.children.push(Parser.createNode(entityType, current, tokenSet[i].value));
-                        }
-                        current.children.push(Parser.createNode(Entity.NESTED, current, nextToken.isolatedLeft ? -1 : tokenSet[i].value));
-                    }
-                    break;*/
-
                 /* --- PUNCTUATION --- */
                 case TokenType.UNDERSCORE:
                     if (nextToken.type === TokenType.NUMBER) {
@@ -428,6 +377,23 @@ export default class Parser {
                     syntaxTree.rootNodes.push(newClipRoot);
                     current = Parser.createAndAddNodeToChildrenAndRetrieve(newClipRoot, Entity.CHAIN);
                     break;
+                /* --- VARIABLES --- */
+                case TokenType.VARIABLE_NAME:
+                    if (nextToken.type !== TokenType.EQUALS) {
+                        // this is a variable reference - resolve it
+
+                    } else {
+                        // this is a variable name followed by assignment. Store name for now.
+                        current.children.push(new VariableName(current, tokenSet[i].value));
+                    }
+/*
+                    if (nextToken.type === TokenType.EQUALS) {
+                        // assignment - create variable node (Entity.VARIABLE) and store contents (nested block) inside. Add node to special variable list, and add reference (e.g. Entity.VARIABLE_REF) to entry from syntax tree.
+                    } else {
+                        // reference - search for given variable name in variable list and add reference (Entity.VARIABLE_REF) if exists
+                    }
+*/
+                    break;
                 /* --- KEYWORDS --- */
                 case TokenType.IDENTIFIER:
                     let entity = Parser.recurseEntityFromIdentifier(tokenSet[i].value);
@@ -454,7 +420,7 @@ export default class Parser {
             }
         }
 
-        function walkChildren(node: INode) {
+        function resolveOperators(node: INode) {
             //console.log("Walking node", Entity[node.type]);
             let containsGenericOp = false;
             for (let childNode of node.children) {
@@ -472,26 +438,16 @@ export default class Parser {
                 } else {
                     // console.log('Error during chomping');
                 }
-                walkChildren(node.children[i]);
+                resolveOperators(node.children[i]);
             }
-/*
-            if (containsGenericOp) {
-                if (node.children.length >= 3) {
-                    walkChildren(node.children[0]);
-                    walkChildren(node.children[node.children.length - 1]);
-                } else {
-                    console.log("At least three parameters needed when operator is used");
-                }
-            }
-*/
         }
 
         // after parsing, we do a second phase where operators are resolved
         for (let node of syntaxTree.rootNodes) {
-            walkChildren(node);
+            resolveOperators(node);
         }
 
-        Parser.printSyntaxTree(syntaxTree);
+        // Parser.printSyntaxTree(syntaxTree);
 
         result.result = syntaxTree;
         return result;

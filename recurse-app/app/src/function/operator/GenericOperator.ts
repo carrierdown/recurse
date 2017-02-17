@@ -7,6 +7,7 @@ import Repeat from "./Repeat";
 import Alternate from "./Alternate";
 import Range from "./Range";
 import Interpolate from "./Interpolate";
+import Variable from "../base/Variable";
 
 export class GenericOperator implements INode {
     public type: Entity;
@@ -33,6 +34,16 @@ export class GenericOperator implements INode {
                 } else {
                     newNode = new Alternate(parent, true);
                 }
+                break;
+            case TokenType.EQUALS:
+                // assignment - create variable node (Entity.VARIABLE) and store contents inside. Add node to special variable list, and add reference (e.g. Entity.VARIABLE_REF) to entry from syntax tree.
+                if (node2.type !== Entity.NESTED) {
+                    throw new Error(`Expected nested block following assignment, but found ${Entity[node2.type]}`);
+                }
+                if (node1.type !== Entity.VARIABLE_NAME) {
+                    throw new Error(`Expected variable name preceding = operator, but found ${Entity[node1.type]}`);
+                }
+                newNode = new Variable(node2.children);
                 break;
             case TokenType.REPEAT:
                 newNode = new Repeat(parent, true);

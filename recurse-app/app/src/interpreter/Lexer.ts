@@ -116,6 +116,9 @@ export default class Lexer {
             return this.processNote();
         }
         if (Lexer.isAlpha(char) && Lexer.isAlpha(nextChar)) { // note that this makes one-letter identifiers impossible unless specifically detected below
+            if (char === '$') {
+                this.processVariableName();
+            }
             return this.processIdentifier();
         }
         if (Lexer.isAlpha(char)) {
@@ -242,6 +245,22 @@ export default class Lexer {
 
         var token = {
             type: TokenType.IDENTIFIER,
+            value: this.buffer.substring(this.position, endpos),
+            pos: this.position
+        };
+        this.position = endpos;
+        return token;
+    }
+
+    private processVariableName(): IToken {
+        var endpos = this.position + 1;
+        while (endpos < this.bufferLength &&
+        Lexer.isAlpha(this.buffer.charAt(endpos))) {
+            endpos++;
+        }
+
+        var token = {
+            type: TokenType.VARIABLE_NAME,
             value: this.buffer.substring(this.position, endpos),
             pos: this.position
         };

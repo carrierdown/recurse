@@ -36,7 +36,8 @@ export enum TokenType {
     SEMI,
     SINGLE_QUOTE,
     START,
-    UNDERSCORE
+    UNDERSCORE,
+    VARIABLE_NAME,
 }
 
 // todo: this will get trickier and trickier to maintain as complexity increases. Remove this and replace with per node validation instead (each node validates its contents).

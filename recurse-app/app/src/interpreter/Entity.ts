@@ -27,6 +27,9 @@ enum Entity {
     ALT_SHORTHAND,
     _OPERATORS_END,
 
+    VARIABLE,
+    VARIABLE_REFERENCE,
+    VARIABLE_NAME,
     CHAIN,
     CONTAINER,
     EMPTY,
