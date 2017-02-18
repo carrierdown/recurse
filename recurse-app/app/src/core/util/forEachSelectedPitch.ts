@@ -1,6 +1,6 @@
-import IContext from "../../function/IContext";
+import {IContext} from "../../function/IContext";
 
-export default function forEachSelectedPitch(context: IContext, process: {(index: number, pitch: number): number}): void {
+export function forEachSelectedPitch(context: IContext, process: {(index: number, pitch: number): number}): void {
     if (!context.selectionActive) {
         return;
     }

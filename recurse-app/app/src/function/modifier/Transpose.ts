@@ -1,14 +1,13 @@
 import _ = require('lodash');
-
-import INode from '../../interpreter/INode';
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
-import forEachSelectedPitch from "../../core/util/forEachSelectedPitch";
-import forEachPitch from "../../core/util/forEachPitch";
+import {INode} from "../../interpreter/INode";
+import {IContext} from "../IContext";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
-import Scale from "../../core/type/Scale";
+import {Scale} from "../../core/type/Scale";
+import {forEachSelectedPitch} from "../../core/util/forEachSelectedPitch";
+import {forEachPitch} from "../../core/util/forEachPitch";
+import {Entity} from "../../interpreter/Entity";
 
-export default class Transpose implements INode {
+export class Transpose implements INode {
     public type: Entity = Entity.TRANSPOSE;
     public children: Array<INode> = [];
     public parent: INode;

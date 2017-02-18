@@ -1,7 +1,8 @@
 // Intended for use in the recurse connector M4L plugin. Implemented here for easy testing via Tape.
 
-import Note from "../type/Note";
 import {Constants} from "../type/Constants";
+import {Note} from "../type/Note";
+
 interface INote {
     start: number;
     duration: number;

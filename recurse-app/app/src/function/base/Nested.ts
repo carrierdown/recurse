@@ -1,14 +1,13 @@
 import _ = require('lodash');
-
-import INode from '../../interpreter/INode';
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
 import {IRecurseValue} from "../../core/type/IRecurseValue";
-import ValueType from "../../interpreter/ValueType";
-import Parser from "../../interpreter/Parser";
-import Helpers from "../../core/util/Helpers";
+import {Parser} from "../../interpreter/Parser";
+import {Helpers} from "../../core/util/Helpers";
+import {INode} from "../../interpreter/INode";
+import {IContext} from "../IContext";
+import {Entity} from "../../interpreter/Entity";
+import {ValueType} from "../../interpreter/ValueType";
 
-export default class Nested implements INode {
+export class Nested implements INode {
     public type: Entity = Entity.NESTED;
     public value: number;
     public children: INode[];

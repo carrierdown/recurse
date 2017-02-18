@@ -1,4 +1,4 @@
-export default class NoteEvent {
+export class NoteEvent {
     public start: number;
     public duration: number;
     public pitch: number;

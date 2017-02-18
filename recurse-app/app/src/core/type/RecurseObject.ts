@@ -1,5 +1,6 @@
-import INode from "../../interpreter/INode";
-export default class RecurseObject {
+import {INode} from "../../interpreter/INode";
+
+export class RecurseObject {
     public interval: number;
     public pitches: number[];
     public order: number;

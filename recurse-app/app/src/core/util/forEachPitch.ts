@@ -1,6 +1,6 @@
-import IContext from "../../function/IContext";
+import {IContext} from "../../function/IContext";
 
-export default function forEachPitch(context: IContext, process: {(index: number, pitch: number): number}): void {
+export function forEachPitch(context: IContext, process: {(index: number, pitch: number): number}): void {
     var ix: number,
         pix: number;
 

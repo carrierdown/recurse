@@ -1,11 +1,11 @@
 import _ = require('lodash');
 
-import INode from '../../interpreter/INode';
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
 import {IRecurseValue} from "../../core/type/IRecurseValue";
+import {INode} from "../../interpreter/INode";
+import {IContext} from "../IContext";
+import {Entity} from "../../interpreter/Entity";
 
-export default class EndSelect implements INode {
+export class EndSelect implements INode {
     public type: Entity = Entity.END_SELECT;
     public children: Array<INode> = [];
     public parent: INode;

@@ -1,8 +1,8 @@
 import tape = require('tape');
 
-import Lexer from "./Lexer";
-import IToken from "./IToken";
 import {TokenType} from "./TokenType";
+import {Lexer} from "./Lexer";
+import {IToken} from "./IToken";
 
 tape('return tokenized version of input', (test) => {
     var input: string = "rm(8 , 6,4,4 * 4,13(8,10;8;6 (5,5),8)):{length:64,loop:32}", // old syntax but lexer should give correct output anyways

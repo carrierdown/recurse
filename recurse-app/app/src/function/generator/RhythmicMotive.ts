@@ -1,15 +1,12 @@
 import _ = require('lodash');
-
-import INode from '../../interpreter/INode';
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
-import RecurseObject from '../../core/type/RecurseObject';
+import {INode} from "../../interpreter/INode";
+import {IContext} from "../IContext";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
-import Value from "../base/Value";
-import ValueType from "../../interpreter/ValueType";
-import Helpers from "../../core/util/Helpers";
+import {ValueType} from "../../interpreter/ValueType";
+import {RecurseObject} from "../../core/type/RecurseObject";
+import {Entity} from "../../interpreter/Entity";
 
-export default class RhythmicMotive implements INode {
+export class RhythmicMotive implements INode {
     public type: Entity = Entity.RM;
     public children: Array<INode> = [];
     public parent: INode;

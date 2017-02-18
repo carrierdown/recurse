@@ -1,4 +1,4 @@
-enum Entity {
+export enum Entity {
     _KEYWORDS_BEGIN,
     RM,
     NS,
@@ -50,5 +50,3 @@ enum Entity {
     SET_SCALE,
     VALUE,
 }
-
-export default Entity;

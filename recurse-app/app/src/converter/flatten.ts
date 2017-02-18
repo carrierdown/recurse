@@ -1,13 +1,13 @@
 import _ = require('lodash');
 
-import RecurseObject from "../core/type/RecurseObject";
-import NoteEvent from "../core/type/NoteEvent";
-import INode from "../interpreter/INode";
 import {Constants} from "../core/type/Constants";
 import {IClip} from "./IClip";
+import {RecurseObject} from "../core/type/RecurseObject";
+import {INode} from "../interpreter/INode";
+import {NoteEvent} from "../core/type/NoteEvent";
 
 // "flattens" sequence for consumption by a typical sequencer. Flattening makes intervals relative to zero rather than the preceding note event
-export default function flatten(itemsSets: Array<Array<RecurseObject>>, clipRootNodes: INode[]): IClip[] {
+export function flatten(itemsSets: Array<Array<RecurseObject>>, clipRootNodes: INode[]): IClip[] {
     var currentPos: number = 0,
         flattenedResultsSets: IClip[] = [],
         flattenedResults: Array<NoteEvent> = [],

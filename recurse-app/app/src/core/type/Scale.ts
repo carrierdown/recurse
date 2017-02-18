@@ -1,7 +1,6 @@
-import Helpers from '../util/Helpers';
-import Note from "./Note";
+import {Note} from "./Note";
 
-export default class Scale {
+export class Scale {
     public indexes: Array<number>;
     public name: string;
     public tonicOffset: number = 0;

@@ -1,8 +1,8 @@
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
-import ISetting from "../../interpreter/ISetting";
+import {ISetting} from "../../interpreter/ISetting";
+import {IContext} from "../IContext";
+import {Entity} from "../../interpreter/Entity";
 
-export default class PatternLength implements ISetting {
+export class PatternLength implements ISetting {
     value: number;
     type: Entity = Entity.PATTERN_LENGTH;
 

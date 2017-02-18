@@ -1,10 +1,9 @@
-import INode from '../../interpreter/INode';
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
+import {INode} from "../../interpreter/INode";
+import {IContext} from "../IContext";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
-import Value from "../base/Value";
+import {Entity} from "../../interpreter/Entity";
 
-export default class VelocitySet implements INode {
+export class VelocitySet implements INode {
     public type: Entity = Entity.VEL;
     public children: INode[] = [];
     public parent: INode;

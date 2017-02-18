@@ -1,9 +1,9 @@
-import INode from '../../interpreter/INode';
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
+import {INode} from "../../interpreter/INode";
+import {IContext} from "../IContext";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
+import {Entity} from "../../interpreter/Entity";
 
-export default class Alternate implements INode {
+export class Alternate implements INode {
     public type: Entity = Entity.ALT;
     public children: Array<INode>;
     public parent: INode;

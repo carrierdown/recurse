@@ -1,4 +1,4 @@
-enum ValueType {
+export enum ValueType {
     FILL,
     INTERVAL,
     NOTE,
@@ -8,5 +8,3 @@ enum ValueType {
     SELECT_INDEX,
     VELOCITY
 }
-
-export default ValueType;

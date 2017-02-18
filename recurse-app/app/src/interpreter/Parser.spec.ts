@@ -1,16 +1,13 @@
 import tape = require('tape');
 import _ = require('lodash');
 
-import Lexer from "./Lexer";
-import IToken from "./IToken";
 import {TokenType} from "./TokenType";
-import Entity from "./Entity";
-import Parser from "./Parser";
-import RecurseResult from "../core/type/RecurseResult";
-import ISyntaxTree from "./ISyntaxTree";
-import INode from "./INode";
-import ValueType from "./ValueType";
-import SyntaxTree from "../function/SyntaxTree";
+import {INode} from "./INode";
+import {Entity} from "./Entity";
+import {Lexer} from "./Lexer";
+import {RecurseResult} from "../core/type/RecurseResult";
+import {SyntaxTree} from "../function/SyntaxTree";
+import {Parser} from "./Parser";
 
 function getSyntaxTreeEntities(nodes: INode[], entities: Entity[] = []): Entity[] {
     for (let node of nodes) {
@@ -58,7 +55,7 @@ tape('Should be possible to do a repeat with an anonymous nested block', (test) 
 });
 
 tape('Should be possible to assign a block to a variable', (test) => {
-    parseAndCheckAgainst("rm($test=(2 4)))", [Entity.ROOT, Entity.CHAIN, Entity.VARIABLE, Entity.VALUE, Entity.VALUE], test);
+    parseAndCheckAgainst("rm($test=(2 4))", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.VARIABLE_REFERENCE], test);
     test.end();
 });
 

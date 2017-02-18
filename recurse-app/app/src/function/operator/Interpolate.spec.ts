@@ -1,8 +1,5 @@
 import tape = require('tape');
-
-import Interpolate from './Interpolate';
-import Value from "../base/Value";
-import ValueType from "../../interpreter/ValueType";
+import {Interpolate} from "./Interpolate";
 
 tape('Testing sum', (test) => {
     let interpolate = new Interpolate();

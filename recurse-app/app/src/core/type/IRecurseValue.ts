@@ -1,5 +1,5 @@
-import ValueType from "../../interpreter/ValueType";
-import INode from "../../interpreter/INode";
+import {INode} from "../../interpreter/INode";
+import {ValueType} from "../../interpreter/ValueType";
 
 export interface IRecurseValue {
     value: number;

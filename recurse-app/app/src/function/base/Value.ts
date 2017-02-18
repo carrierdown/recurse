@@ -1,14 +1,13 @@
-import INode from '../../interpreter/INode';
-import ValueType from '../../interpreter/ValueType';
-import IContext from '../../function/IContext';
-import Entity from "../../interpreter/Entity";
+import {INode} from "../../interpreter/INode";
+import {ValueType} from "../../interpreter/ValueType";
+import {IContext} from "../IContext";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
-import Helpers from "../../core/util/Helpers";
+import {Helpers} from "../../core/util/Helpers";
+import {Entity} from "../../interpreter/Entity";
 
 // todo: create Interval, Note, PitchOffset and so on.. Interval needs to take into account current res for instance, and
 // recalc to keep a consistent res of 1/16 for instance. This is important due to other params like patternLength using this reso.
-
-export default class Value implements INode {
+export class Value implements INode {
     public type: Entity = Entity.VALUE;
     public valueType: ValueType;
     public value: number;

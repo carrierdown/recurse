@@ -1,8 +1,8 @@
 import _ = require('lodash');
-import INode from "../../interpreter/INode";
-import Entity from "../../interpreter/Entity";
+import {INode} from "../../interpreter/INode";
+import {Entity} from "../../interpreter/Entity";
 
-export default class Helpers {
+export class Helpers {
     static ensureRange(val: number, min: number, max: number): number {
         if (val < min) return min;
         if (val > max) return max;

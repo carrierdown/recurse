@@ -1,13 +1,12 @@
 import _ = require('lodash');
-
-import INode from '../../interpreter/INode';
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
-import forEachSelectedPitch from "../../core/util/forEachSelectedPitch";
-import forEachPitch from "../../core/util/forEachPitch";
+import {INode} from "../../interpreter/INode";
+import {IContext} from "../IContext";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
+import {forEachSelectedPitch} from "../../core/util/forEachSelectedPitch";
+import {forEachPitch} from "../../core/util/forEachPitch";
+import {Entity} from "../../interpreter/Entity";
 
-export default class Pitch implements INode {
+export class Pitch implements INode {
     public type: Entity = Entity.PITCH;
     public children: Array<INode> = [];
     public parent: INode;

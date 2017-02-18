@@ -1,9 +1,9 @@
-import INode from './INode';
-import RecurseObject from '../core/type/RecurseObject';
+import {INode} from "./INode";
+import {RecurseObject} from "../core/type/RecurseObject";
 
-interface ISyntaxTree {
-    rootNodes: Array<INode>;
-    generate: () => Array<Array<RecurseObject>>;
+export interface ISyntaxTree {
+    rootNodes: INode[];
+    variables: any;
+    generate: () => RecurseObject[][];
+    findVariable: (name: string) => INode;
 }
-
-export default ISyntaxTree;

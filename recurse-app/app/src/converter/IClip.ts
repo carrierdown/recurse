@@ -1,4 +1,4 @@
-import NoteEvent from "../core/type/NoteEvent";
+import {NoteEvent} from "../core/type/NoteEvent";
 
 export interface IClip {
     notes: NoteEvent[];

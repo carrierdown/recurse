@@ -1,6 +1,6 @@
 import sprintf_js = require('sprintf-js');
 
-export default class ErrorMessages {
+export class ErrorMessages {
     public static FILE_READ_ERROR: string = 'Unable to read file %s';
     public static UNEXPECTED_TOKEN_ERROR: string = 'Expected %s following %s, but found %s';
     public static REPEAT_STATEMENT_TOO_MANY_OPERANDS: string = 'Repeat statement can only contain 2 operands';

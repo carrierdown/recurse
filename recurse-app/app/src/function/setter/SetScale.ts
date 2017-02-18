@@ -1,11 +1,10 @@
-import INode from '../../interpreter/INode';
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
 import {IRecurseValue} from "../../core/type/IRecurseValue";
-import ISetting from "../../interpreter/ISetting";
-import Scale from "../../core/type/Scale";
+import {ISetting} from "../../interpreter/ISetting";
+import {IContext} from "../IContext";
+import {Scale} from "../../core/type/Scale";
+import {Entity} from "../../interpreter/Entity";
 
-export default class SetScale implements ISetting {
+export class SetScale implements ISetting {
     value: string;
     type: Entity = Entity.SET_SCALE;
 

@@ -1,7 +1,5 @@
-enum RecurseStatus {
+export enum RecurseStatus {
     OK,
     ERROR,
     WARNING
 }
-
-export default RecurseStatus;

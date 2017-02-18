@@ -3,16 +3,16 @@ import program = require('commander');
 import dgram = require('dgram');
 import osc = require('osc-min');
 
-import RecurseResult from "../core/type/RecurseResult";
-import ICompilerSettings from "./ICompilerSettings";
-import Lexer from "../interpreter/Lexer";
-import Parser from "../interpreter/Parser";
-import ISyntaxTree from "../interpreter/ISyntaxTree";
-import IToken from "../interpreter/IToken";
-import flatten from "../converter/flatten";
 import {IClip} from "../converter/IClip";
+import {ICompilerSettings} from "./ICompilerSettings";
+import {RecurseResult} from "../core/type/RecurseResult";
+import {Lexer} from "../interpreter/Lexer";
+import {Parser} from "../interpreter/Parser";
+import {flatten} from "../converter/flatten";
+import {IToken} from "../interpreter/IToken";
+import {ISyntaxTree} from "../interpreter/ISyntaxTree";
 
-export default class Compiler {
+export class Compiler {
     public inport = 8008;
     public outport = 8009;
     private udp;

@@ -1,13 +1,15 @@
-import INode from "../../interpreter/INode";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
-import IContext from "../IContext";
-import Entity from "../../interpreter/Entity";
+import {INode} from "../../interpreter/INode";
 import {TokenType} from "../../interpreter/TokenType";
-import Repeat from "./Repeat";
-import Alternate from "./Alternate";
-import Range from "./Range";
-import Interpolate from "./Interpolate";
-import Variable from "../base/Variable";
+import {IContext} from "../IContext";
+import {ISyntaxTree} from "../../interpreter/ISyntaxTree";
+import {Alternate} from "./Alternate";
+import {Variable} from "../base/Variable";
+import {VariableReference} from "../base/VariableReference";
+import {Repeat} from "./Repeat";
+import {Interpolate} from "./Interpolate";
+import {Range} from "./Range";
+import {Entity} from "../../interpreter/Entity";
 
 export class GenericOperator implements INode {
     public type: Entity;
@@ -21,7 +23,7 @@ export class GenericOperator implements INode {
         return [];
     }
 
-    public transform(parent: INode, node1: INode, node2: INode): INode {
+    public transform(parent: INode, node1: INode, node2: INode, syntaxTree: ISyntaxTree): INode {
         var newNode;
         switch (this.operatorToken) {
             case TokenType.SINGLE_QUOTE:
@@ -43,8 +45,11 @@ export class GenericOperator implements INode {
                 if (node1.type !== Entity.VARIABLE_NAME) {
                     throw new Error(`Expected variable name preceding = operator, but found ${Entity[node1.type]}`);
                 }
-                newNode = new Variable(node2.children);
-                break;
+                let varNode = new Variable(node1.name, node2.children);
+                // todo: maybe warn if variable is overwritten here
+                syntaxTree.variables[node1.name] = varNode;
+                newNode = new VariableReference(parent, varNode);
+                return newNode;
             case TokenType.REPEAT:
                 newNode = new Repeat(parent, true);
                 break;

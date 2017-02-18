@@ -1,10 +1,10 @@
-import IToken from './IToken';
-import { TokenType } from "./TokenType";
+import {TokenType} from "./TokenType";
+import {IToken} from "./IToken";
 
 // todo: should rewrite from scratch
 // should probably differentiate between keywords (maybe with separate classes for functions, scales, and so on) and identifiers (or maybe scales belong here, together with variables and so on)
 
-export default class Lexer {
+export class Lexer {
     private position: number = 0;
     private buffer: string = null;
     private bufferLength: number;
@@ -117,7 +117,7 @@ export default class Lexer {
         }
         if (Lexer.isAlpha(char) && Lexer.isAlpha(nextChar)) { // note that this makes one-letter identifiers impossible unless specifically detected below
             if (char === '$') {
-                this.processVariableName();
+                return this.processVariableName();
             }
             return this.processIdentifier();
         }

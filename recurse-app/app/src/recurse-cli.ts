@@ -2,12 +2,11 @@ import program = require('commander');
 import fs = require('fs');
 var watch = require('node-watch');
 
-import Compiler from "./compiler/Compiler";
-import RecurseResult from "./core/type/RecurseResult";
-import RecurseStatus from "./core/type/RecurseStatus";
-import ErrorMessages from "./compiler/ErrorMessages";
-import NoteEvent from "./core/type/NoteEvent";
 import {IClip} from "./converter/IClip";
+import {Compiler} from "./compiler/Compiler";
+import {RecurseResult} from "./core/type/RecurseResult";
+import {RecurseStatus} from "./core/type/RecurseStatus";
+import {ErrorMessages} from "./compiler/ErrorMessages";
 
 program
     .version('0.0.1')

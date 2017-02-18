@@ -1,13 +1,12 @@
 import _ = require('lodash');
 
-import INode from '../../interpreter/INode';
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
 import { SelectStrategy, SelectStrategyTable } from './SelectStrategy';
 import {IRecurseValue} from "../../core/type/IRecurseValue";
-import Value from "../base/Value";
+import {INode} from "../../interpreter/INode";
+import {IContext} from "../IContext";
+import {Entity} from "../../interpreter/Entity";
 
-export default class Select implements INode {
+export class Select implements INode {
     public type: Entity = Entity.SELECT;
     public children: Array<INode> = [];
     public parent: INode;

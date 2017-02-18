@@ -1,10 +1,8 @@
-import IContext from '../function/IContext';
-import Entity from "./Entity";
+import {Entity} from "./Entity";
+import {IContext} from "../function/IContext";
 
-interface ISetting {
+export interface ISetting {
     type: Entity;
     value: any;
     apply: (context: IContext) => void;
 }
-
-export default ISetting;

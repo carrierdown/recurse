@@ -1,4 +1,4 @@
-import createLookupTable from "../../core/util/createLookupTable";
+import {createLookupTable} from "../../core/util/createLookupTable";
 
 export enum SelectStrategy {
     even,

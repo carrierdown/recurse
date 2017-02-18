@@ -1,10 +1,10 @@
-import INode from '../../interpreter/INode';
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
-import ValueType from "../../interpreter/ValueType";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
+import {INode} from "../../interpreter/INode";
+import {IContext} from "../IContext";
+import {ValueType} from "../../interpreter/ValueType";
+import {Entity} from "../../interpreter/Entity";
 
-export default class Fill implements INode {
+export class Fill implements INode {
     public type: Entity = Entity.FILL;
     public children: Array<INode>;
     public parent: INode;

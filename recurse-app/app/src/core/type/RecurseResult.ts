@@ -1,6 +1,6 @@
-import RecurseStatus from "./RecurseStatus";
+import {RecurseStatus} from "./RecurseStatus";
 
-export default class RecurseResult<T> {
+export class RecurseResult<T> {
     public error: string;
     public status: RecurseStatus;
     public result: T;

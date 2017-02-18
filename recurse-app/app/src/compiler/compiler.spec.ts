@@ -4,12 +4,10 @@ import tape = require('tape');
 import fs = require('fs');
 import path = require('path');
 
-import Compiler from "./Compiler";
-import RecurseResult from "../core/type/RecurseResult";
-import RecurseStatus from "../core/type/RecurseStatus";
-import ISyntaxTree from "../interpreter/ISyntaxTree";
-import NoteEvent from "../core/type/NoteEvent";
 import {IClip} from "../converter/IClip";
+import {Compiler} from "./Compiler";
+import {RecurseResult} from "../core/type/RecurseResult";
+import {RecurseStatus} from "../core/type/RecurseStatus";
 
 function forEachFileInDir(dirname: string, callback: (filename: string, content: string, expectedContent: string) => void, finalize: () => void, soloFile: string = '') {
     var filenames:Array<string> = fs.readdirSync(dirname);

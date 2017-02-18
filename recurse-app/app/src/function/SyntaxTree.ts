@@ -1,18 +1,18 @@
 import _ = require('lodash');
 
-import INode from '../interpreter/INode';
-import ISyntaxTree from '../interpreter/ISyntaxTree';
-import RecurseObject from '../core/type/RecurseObject';
-import IContext from './IContext';
-import Scale from "../core/type/Scale";
-import Note from "../core/type/Note";
 import {Constants} from "../core/type/Constants";
+import {ISyntaxTree} from "../interpreter/ISyntaxTree";
+import {INode} from "../interpreter/INode";
+import {RecurseObject} from "../core/type/RecurseObject";
+import {IContext} from "./IContext";
+import {Scale} from "../core/type/Scale";
 
-export default class SyntaxTree implements ISyntaxTree {
+export class SyntaxTree implements ISyntaxTree {
+    public variables: any = {}; // todo: refine
     public rootNodes: Array<INode> = [];
 
-    public generate(): Array<Array<RecurseObject>> {
-        var contexts: Array<IContext> = [];
+    public generate(): RecurseObject[][] {
+        var contexts: IContext[] = [];
         for (let rootNode of this.rootNodes) {
             contexts.push({
                 results: [],
@@ -42,5 +42,9 @@ export default class SyntaxTree implements ISyntaxTree {
         }
         results.push(resultBuffer);
         return results;
+    }
+
+    public findVariable(name: string): INode {
+        return this.variables[name] as INode;
     }
 }

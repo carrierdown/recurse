@@ -1,13 +1,13 @@
 // This construct is similar to a "part" in traditional sequencers like Cubase etc.
 // Transforms that need information about all notes in a part should be done here, such as mutate/shuffle/etc.
 
-import INode from '../../interpreter/INode';
-import Entity from '../../interpreter/Entity';
-import IContext from '../../function/IContext';
+import {INode} from "../../interpreter/INode";
+import {ISetting} from "../../interpreter/ISetting";
+import {IContext} from "../IContext";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
-import ISetting from "../../interpreter/ISetting";
+import {Entity} from "../../interpreter/Entity";
 
-export default class Chain implements INode {
+export class Chain implements INode {
     public type: Entity = Entity.CHAIN;
     public children: Array<INode>;
     public parent: INode;

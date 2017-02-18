@@ -1,44 +1,41 @@
 import _ = require('lodash');
 
-import IToken from './IToken';
-import INode from './INode';
-import ISyntaxTree from './ISyntaxTree';
-import SyntaxTree from '../function/SyntaxTree';
-import Note from '../core/type/Note';
-
-import Nested from '../function/base/Nested';
-import Root from '../function/base/Root';
-import NoteSet from '../function/generator/NoteSet';
-import RhythmicMotive from '../function/generator/RhythmicMotive';
-import Alternate from '../function/operator/Alternate';
-import Chain from '../function/operator/Chain';
-import Repeat from '../function/operator/Repeat';
-import Transpose from "../function/modifier/Transpose";
-import Select from "../function/selection/Select";
-import { SelectStrategy } from "../function/selection/SelectStrategy";
-import EndSelect from "../function/selection/EndSelect";
-import { TokenType, TokenTypeExpect, getExpectsString } from "./TokenType";
-import RecurseResult from "../core/type/RecurseResult";
-import ErrorMessages from "../compiler/ErrorMessages";
-import Random from "../function/operator/Random";
-import Fill from "../function/operator/Fill";
-import Value from "../function/base/Value";
-import ValueType from "./ValueType";
-import Entity from "./Entity";
-import Interpolate from "../function/operator/Interpolate";
-import PatternLength from "../function/setter/PatternLength";
-import ISetting from "./ISetting";
-import Scale from "../core/type/Scale";
-import SetScale from "../function/setter/SetScale";
-import Loop from "../function/setter/Loop";
-import Pitch from "../function/modifier/Pitch";
-import Range from "../function/operator/Range";
-import VelocitySet from "../function/generator/VelocitySet";
+import {TokenType} from "./TokenType";
+import {Entity} from "./Entity";
+import {IToken} from "./IToken";
+import {ISetting} from "./ISetting";
+import {Note} from "../core/type/Note";
+import {PatternLength} from "../function/setter/PatternLength";
+import {INode} from "./INode";
+import {Loop} from "../function/setter/Loop";
+import {SetScale} from "../function/setter/SetScale";
+import {Alternate} from "../function/operator/Alternate";
+import {Chain} from "../function/operator/Chain";
+import {EndSelect} from "../function/selection/EndSelect";
+import {SelectStrategy} from "../function/selection/SelectStrategy";
+import {ValueType} from "./ValueType";
+import {Interpolate} from "../function/operator/Interpolate";
+import {Select} from "../function/selection/Select";
+import {Value} from "../function/base/Value";
+import {Nested} from "../function/base/Nested";
+import {NoteSet} from "../function/generator/NoteSet";
+import {Pitch} from "../function/modifier/Pitch";
+import {Repeat} from "../function/operator/Repeat";
+import {RhythmicMotive} from "../function/generator/RhythmicMotive";
+import {Random} from "../function/operator/Random";
+import {Root} from "../function/base/Root";
+import {Transpose} from "../function/modifier/Transpose";
+import {VelocitySet} from "../function/generator/VelocitySet";
+import {ISyntaxTree} from "./ISyntaxTree";
+import {Range} from "../function/operator/Range";
+import {RecurseResult} from "../core/type/RecurseResult";
+import {SyntaxTree} from "../function/SyntaxTree";
+import {ErrorMessages} from "../compiler/ErrorMessages";
 import {GenericOperator} from "../function/operator/GenericOperator";
-import Helpers from "../core/util/Helpers";
-import VariableName from "../function/base/VariableName";
+import {VariableReference} from "../function/base/VariableReference";
+import {VariableName} from "../function/base/VariableName";
 
-export default class Parser {
+export class Parser {
     public static get SHORTHAND_TOKENS(): Array<TokenType> {
         return [TokenType.REPEAT, TokenType.SINGLE_QUOTE, TokenType.UNDERSCORE]
     }
@@ -248,7 +245,7 @@ export default class Parser {
         for (let i = 0; i < tokenSet.length; i++) {
             let nextToken = Parser.tokenSetLookAhead(tokenSet, i, 1);
             let prevToken = Parser.tokenSetLookAhead(tokenSet, i, -1);
-            let expects: Array<TokenType> = TokenTypeExpect[prevToken.type];
+            /*let expects: Array<TokenType> = TokenTypeExpect[prevToken.type];
 
             if (expects !== undefined && expects.indexOf(tokenSet[i].type) < 0) {
                 return result.setError(ErrorMessages.getError(
@@ -257,7 +254,7 @@ export default class Parser {
                     TokenType[prevToken.type],
                     TokenType[tokenSet[i].type]
                 ));
-            }
+            }*/
 
             let entityType;
 
@@ -381,6 +378,12 @@ export default class Parser {
                 case TokenType.VARIABLE_NAME:
                     if (nextToken.type !== TokenType.EQUALS) {
                         // this is a variable reference - resolve it
+                        let varNode = syntaxTree.findVariable(tokenSet[i].value);
+                        if (varNode) {
+                            current.children[current.children.length - 1] = new VariableReference(current, varNode);
+                        } else {
+                            throw new Error(`Couldn't resolve variable ${tokenSet[i].value}`);
+                        }
 
                     } else {
                         // this is a variable name followed by assignment. Store name for now.
@@ -432,8 +435,8 @@ export default class Parser {
             for (let i = 0; i < node.children.length; i++) {
                 if (node.children[i].type === Entity.GENERIC_OPERATOR && i > 0 && i < node.children.length - 1) {
                     //console.log("Transforming generic operator");
-                    let newNode: INode = node.children[i].transform(node, node.children[i - 1], node.children[i + 1]);
-                    i = i - 1;
+                    let newNode: INode = node.children[i].transform(node, node.children[i - 1], node.children[i + 1], syntaxTree);
+                    i--;
                     node.children.splice(i, 3, newNode);
                 } else {
                     // console.log('Error during chomping');
@@ -447,7 +450,7 @@ export default class Parser {
             resolveOperators(node);
         }
 
-        // Parser.printSyntaxTree(syntaxTree);
+        //Parser.printSyntaxTree(syntaxTree);
 
         result.result = syntaxTree;
         return result;
@@ -484,10 +487,7 @@ export default class Parser {
         }
     }
 
-    private static parseToken(token: IToken, current: INode) {
-
-    }
-
+    // todo remove
     private static exitShorthandStatements(current: INode): INode {
         while (Parser.isShorthandEntity(current.type)) {
             current = current.parent;
@@ -520,12 +520,14 @@ export default class Parser {
         return current;
     }
 
+    // todo remove
     private static isTerminatingToken(token: TokenType): boolean {
         return token === TokenType.COMMA || token === TokenType.RIGHT_PAREN; // || tokenName === 'PIPE';
     }
 
     // determines whether the given token forms part of a shorthand definition such as 3;4;5 or 3*3,
     // which would be shorthand for alt(3,4,5) and rep(3,3) respectively.
+    // todo remove
     private static isShortHandToken(token: TokenType): boolean {
         return Parser.SHORTHAND_TOKENS.indexOf(token) >= 0;
     }
@@ -539,6 +541,10 @@ export default class Parser {
         for (let rootNode of syntaxTree.rootNodes) {
             syntaxTreeOutput += Parser.printSyntaxNode(rootNode, 0);
         }
+        var variableNames = Object.getOwnPropertyNames(syntaxTree.variables);
+        for (let varNode of variableNames) {
+            syntaxTreeOutput += Parser.printSyntaxNode(syntaxTree.variables[varNode] as INode, 0);
+        }
         console.log(syntaxTreeOutput);
     }
 
@@ -550,23 +556,34 @@ export default class Parser {
         var i,
             output = '',
             parent = '',
-            value = '';
+            value = '',
+            indent: string = _.repeat(' ', level);
 
         if (node['value'] !== undefined) {
             value = node['value'];
         }
 
         output += `
-            ${_.repeat(' ', level)}- type:      ${Entity[node.type]}
-            ${_.repeat(' ', level)}  value:     ${value || ''}`;
+            ${indent}- type:      ${Entity[node.type]}
+            ${indent}  value:     ${value || ''}`;
+
+        if (node['name']) {
+            output += `
+            ${indent}  name:      ${node['name']}`;
+        }
+
+        if (node['variableRef']) {
+            output += `
+            ${indent}  referring: ${node['variableRef']['name']}`;
+        }
 
         if (node['valueType']) {
             output += `
-            ${_.repeat(' ', level)}  valueType: ${ValueType[node['valueType']]}`;
+            ${indent}  valueType: ${ValueType[node['valueType']]}`;
         }
         if (node['settings']) {
             output += `
-            ${_.repeat(' ', level)}  settings: ${Parser.printNodeSettings(node.settings, level)}`;
+            ${indent}  settings: ${Parser.printNodeSettings(node.settings, level)}`;
         }
 
         for (i = 0; i < node.children.length; i++) {
