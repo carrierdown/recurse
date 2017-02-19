@@ -1,1 +1,1 @@
-rm($test=(2 4))
+rm($myVar=(8 8) $myVar x3) ns(c3)

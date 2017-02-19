@@ -55,7 +55,7 @@ tape('Should be possible to do a repeat with an anonymous nested block', (test) 
 });
 
 tape('Should be possible to assign a block to a variable', (test) => {
-    parseAndCheckAgainst("rm($test=(2 4))", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.VARIABLE_REFERENCE], test);
+    parseAndCheckAgainst("rm($test=(2 4) $test)", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.VARIABLE_REFERENCE], test);
     test.end();
 });
 

@@ -33,7 +33,7 @@ import {SyntaxTree} from "../function/SyntaxTree";
 import {ErrorMessages} from "../compiler/ErrorMessages";
 import {GenericOperator} from "../function/operator/GenericOperator";
 import {VariableReference} from "../function/base/VariableReference";
-import {VariableName} from "../function/base/VariableName";
+import {Variable} from "../function/base/Variable";
 
 export class Parser {
     public static get SHORTHAND_TOKENS(): Array<TokenType> {
@@ -380,22 +380,16 @@ export class Parser {
                         // this is a variable reference - resolve it
                         let varNode = syntaxTree.findVariable(tokenSet[i].value);
                         if (varNode) {
-                            current.children[current.children.length - 1] = new VariableReference(current, varNode);
+                            current.children.push(new VariableReference(current, tokenSet[i].value, varNode));
                         } else {
                             throw new Error(`Couldn't resolve variable ${tokenSet[i].value}`);
                         }
-
                     } else {
-                        // this is a variable name followed by assignment. Store name for now.
-                        current.children.push(new VariableName(current, tokenSet[i].value));
+                        // This is a variable name followed by assignment. Create empty variable node and add reference to it, since subsequent instances of variable won't be possible to resolve otherwise (actual variable assignment happens in resolveOperators step after parsing is completed).
+                        let varNode = new Variable(tokenSet[i].value, []);
+                        syntaxTree.variables[varNode.name] = varNode;
+                        current.children.push(new VariableReference(current, varNode.name, varNode));
                     }
-/*
-                    if (nextToken.type === TokenType.EQUALS) {
-                        // assignment - create variable node (Entity.VARIABLE) and store contents (nested block) inside. Add node to special variable list, and add reference (e.g. Entity.VARIABLE_REF) to entry from syntax tree.
-                    } else {
-                        // reference - search for given variable name in variable list and add reference (Entity.VARIABLE_REF) if exists
-                    }
-*/
                     break;
                 /* --- KEYWORDS --- */
                 case TokenType.IDENTIFIER:
@@ -424,22 +418,20 @@ export class Parser {
         }
 
         function resolveOperators(node: INode) {
-            //console.log("Walking node", Entity[node.type]);
-            let containsGenericOp = false;
-            for (let childNode of node.children) {
-                if (childNode.type === Entity.GENERIC_OPERATOR) {
-                    containsGenericOp = true;
-                    break;
-                }
-            }
             for (let i = 0; i < node.children.length; i++) {
-                if (node.children[i].type === Entity.GENERIC_OPERATOR && i > 0 && i < node.children.length - 1) {
-                    //console.log("Transforming generic operator");
-                    let newNode: INode = node.children[i].transform(node, node.children[i - 1], node.children[i + 1], syntaxTree);
-                    i--;
-                    node.children.splice(i, 3, newNode);
-                } else {
-                    // console.log('Error during chomping');
+                if (node.children[i].type === Entity.GENERIC_OPERATOR) {
+                    if (i > 0 && i < node.children.length - 1) {
+                        //console.log("Transforming generic operator");
+                        let newNode: INode = node.children[i].transform(node, node.children[i - 1], node.children[i + 1], syntaxTree);
+                        i--;
+                        if (newNode !== null) {
+                            node.children.splice(i, 3, newNode);
+                        } else {
+                            node.children.splice(i, 3);
+                        }
+                    } else {
+                        throw new Error(`Unable to transform generic operator of type ${TokenType[node.children[i]['operatorToken']]}`);
+                    }
                 }
                 resolveOperators(node.children[i]);
             }
@@ -570,11 +562,6 @@ export class Parser {
         if (node['name']) {
             output += `
             ${indent}  name:      ${node['name']}`;
-        }
-
-        if (node['variableRef']) {
-            output += `
-            ${indent}  referring: ${node['variableRef']['name']}`;
         }
 
         if (node['valueType']) {

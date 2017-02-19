@@ -38,18 +38,17 @@ export class GenericOperator implements INode {
                 }
                 break;
             case TokenType.EQUALS:
-                // assignment - create variable node (Entity.VARIABLE) and store contents inside. Add node to special variable list, and add reference (e.g. Entity.VARIABLE_REF) to entry from syntax tree.
+                // assignment - empty variable is already created when variable name is encountered for the first time, so retrieve it and populate it.
                 if (node2.type !== Entity.NESTED) {
                     throw new Error(`Expected nested block following assignment, but found ${Entity[node2.type]}`);
                 }
-                if (node1.type !== Entity.VARIABLE_NAME) {
+                if (node1.type !== Entity.VARIABLE_REFERENCE) {
                     throw new Error(`Expected variable name preceding = operator, but found ${Entity[node1.type]}`);
                 }
-                let varNode = new Variable(node1.name, node2.children);
-                // todo: maybe warn if variable is overwritten here
-                syntaxTree.variables[node1.name] = varNode;
-                newNode = new VariableReference(parent, varNode);
-                return newNode;
+                let varNode = syntaxTree.variables[node1.name];
+                varNode.children = node2.children;
+                //newNode = new VariableReference(parent, node1.name, varNode);
+                return null;
             case TokenType.REPEAT:
                 newNode = new Repeat(parent, true);
                 break;

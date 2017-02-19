@@ -38,7 +38,6 @@ tape('Testing compiler with valid code', (test) => {
     compiler.setDebug(true);
     compiler.setPreview(true);
 
-    console.log("hello");
     forEachFileInDir(dirname, (filename, content, expectedContent) => {
         compile = compiler.compile(content);
         if (compile.status === RecurseStatus.ERROR) {
@@ -69,7 +68,7 @@ tape('Testing compiler with valid code', (test) => {
         }
     }, () => {
         test.end();
-    }/*, 'pitchPlus.rse'*/);
+    }/*, 'variables.rse'*/);
 });
 
 

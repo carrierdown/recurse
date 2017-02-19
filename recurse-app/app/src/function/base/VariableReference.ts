@@ -8,9 +8,11 @@ export class VariableReference implements INode {
     public children: Array<INode> = [];
     public parent: INode;
     public variableRef: INode;
+    public name: string;
 
-    constructor(parent: INode, variableRef: INode) {
+    constructor(parent: INode, name: string, variableRef: INode) {
         this.parent = parent;
+        this.name = name;
         this.variableRef = variableRef;
     }
 
