@@ -4,6 +4,7 @@ import {IContext} from "../IContext";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
 import {Helpers} from "../../core/util/Helpers";
 import {Entity} from "../../interpreter/Entity";
+import {Parser} from "../../interpreter/Parser";
 
 // todo: create Interval, Note, PitchOffset and so on.. Interval needs to take into account current res for instance, and
 // recalc to keep a consistent res of 1/16 for instance. This is important due to other params like patternLength using this reso.
@@ -25,10 +26,14 @@ export class Value implements INode {
     public generate(context: IContext): Array<IRecurseValue> {
         // todo: do any transforms needed here, based on type: INTERVAL, NOTE, REST, etc.. Interval needs to take into account current res for instance, and
         // recalc to keep a consistent res of 1/16 for instance. This is important due to other params like patternLength using this reso.
-        let value = this.value;
+        var value = this.value,
+            currentValueType = this.valueType;
 
         if (this.valueType === ValueType.VELOCITY) {
             value = Helpers.ensureRange(value, 0, 127);
+        }
+        if (currentValueType === ValueType.VARIABLE) {
+            currentValueType = Parser.resolveVariableValueType(this);
         }
 /*
         if (this.valueType === ValueType.SCALE_DEGREE) {
@@ -36,7 +41,7 @@ export class Value implements INode {
             value = context.scale.scaleDegreeToNote(this.value, context.rootOct);
         }
 */
-        return [{value: value, valueType: this.valueType}];
+        return [{value: value, valueType: currentValueType}];
     }
 
     // have a lookup table of different valuetype handlers here, called by generate

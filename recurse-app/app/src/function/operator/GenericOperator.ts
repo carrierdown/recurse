@@ -46,8 +46,10 @@ export class GenericOperator implements INode {
                     throw new Error(`Expected variable name preceding = operator, but found ${Entity[node1.type]}`);
                 }
                 let varNode = syntaxTree.variables[node1.name];
-                varNode.children = node2.children;
-                //newNode = new VariableReference(parent, node1.name, varNode);
+                for (let child of node2.children) {
+                    child.parent = varNode;
+                }
+                varNode.children = node2.children;                //newNode = new VariableReference(parent, node1.name, varNode);
                 return null;
             case TokenType.REPEAT:
                 newNode = new Repeat(parent, true);

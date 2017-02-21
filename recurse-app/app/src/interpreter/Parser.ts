@@ -82,6 +82,23 @@ export class Parser {
         }
     }
 
+    public static resolveVariableValueType(node: INode): ValueType {
+        switch (Parser.inferGenericValueArgument(node)) {
+            case Entity.INTERVAL:
+                return ValueType.INTERVAL;
+            case Entity.RAW_NOTE:
+            case Entity.NOTE:
+                return ValueType.NOTE;
+            case Entity.VELOCITY:
+                return ValueType.VELOCITY;
+            case Entity.PITCH_OFFSET:
+                return ValueType.PITCH_OFFSET;
+            case Entity.SELECT_INDEX:
+                return ValueType.SELECT_INDEX;
+            default:
+        }
+    }
+
     public static createNode(type: Entity, parent: INode = null, value: any = null, children: Array<INode> = []): INode {
         if (type === Entity.NOTE) {
             value = Note.pitchFromNoteName(value);
@@ -119,6 +136,7 @@ export class Parser {
             case Entity.SELECT: return new Select(parent, SelectStrategy.indexList);
             case Entity.SELECT_INDEX: return new Value(value, parent, ValueType.SELECT_INDEX);
             case Entity.TRANSPOSE: return new Transpose(parent, children);
+            case Entity.VARIABLE_VALUE: return new Value(value, parent, ValueType.VARIABLE);
             case Entity.VEL: return new VelocitySet(parent, children);
             case Entity.VELOCITY: return new Value(value, parent, ValueType.VELOCITY);
             default:
@@ -448,16 +466,21 @@ export class Parser {
         return result;
     }
 
-    private static inferGenericValueArgument(node: INode): Entity {
+    private static inferGenericValueArgument(node: INode, originalNode: INode = null): Entity {
+        if (originalNode === null) {
+            originalNode = node;
+        }
         if (!node) {
-            console.log('Temp: Reached top of tree without matches');
-            return Entity.INVALID;
+            throw new Error(`Unable to find valid argument type for ${Entity[originalNode.type]}`);
         }
         switch (node.type) {
             case Entity.ROOT:
                 // error: no typable arguments possible here
-                console.log('Temp: No typable arguments possible here');
-                return Entity.INVALID;
+                if (originalNode && originalNode.type === Entity.NESTED) {
+                    // this is probably a variable declaration, so defer value type check
+                    return Entity.VARIABLE_VALUE;
+                }
+                throw new Error(`Unable to find valid argument type for ${Entity[originalNode.type]}`);
             case Entity.RM:
                 return Entity.INTERVAL;
             case Entity.NS:
@@ -475,7 +498,7 @@ export class Parser {
                     return Entity.INTERVAL;
                 }
             default:
-                return Parser.inferGenericValueArgument(node.parent);
+                return Parser.inferGenericValueArgument(node.parent, originalNode);
         }
     }
 

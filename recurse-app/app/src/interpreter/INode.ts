@@ -17,4 +17,5 @@ export interface INode {
     settings?: Array<ISetting>;
     transform?: (parent: INode, node1: INode, node2: INode, syntaxTree: ISyntaxTree) => INode;
     name?: string;
+    generateVar?: (context: IContext, parent: INode) => IRecurseValue[];
 }

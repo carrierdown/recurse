@@ -29,7 +29,7 @@ export enum Entity {
 
     VARIABLE,
     VARIABLE_REFERENCE,
-    VARIABLE_NAME,
+    VARIABLE_VALUE,
     CHAIN,
     CONTAINER,
     EMPTY,

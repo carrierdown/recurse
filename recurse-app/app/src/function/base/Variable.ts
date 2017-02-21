@@ -15,12 +15,19 @@ export class Variable implements INode {
         this.name = name;
     }
 
-    public generate(context: IContext): Array<IRecurseValue> {
+    public generate(context: IContext): IRecurseValue[] {
         var results: IRecurseValue[] = [];
 
         for (let child of this.children) {
             results = results.concat(child.generate(context));
         }
+        return results;
+    }
+
+    public generateVar(context: IContext, parent: INode): IRecurseValue[] {
+        this.parent = parent;
+        var results: IRecurseValue[] = this.generate(context);
+        this.parent = null;
         return results;
     }
 }

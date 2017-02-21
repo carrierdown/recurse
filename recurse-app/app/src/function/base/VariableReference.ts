@@ -17,6 +17,6 @@ export class VariableReference implements INode {
     }
 
     public generate(context: IContext): Array<IRecurseValue> {
-        return this.variableRef.generate(context);
+        return this.variableRef.generateVar(context, this.parent);
     }
 }
