@@ -21,18 +21,18 @@ export class Repeat implements INode {
             console.log('WARN: Repeat produced no output due to incorrect params');
             return;
         }
+
+        // Swap arguments if they are obviously in the wrong order
+        if (this.children[0].type === Entity.NESTED && this.children[1].type === Entity.VALUE) {
+            [this.children[0], this.children[1]] = [this.children[1], this.children[0]];
+        }
+
         var numRepeats: number = this.children[1].generate(context)[0].value,
-            results: Array<IRecurseValue> = [];
+            results: IRecurseValue[] = [];
 
         for (let i = 0; i < numRepeats; i++) {
-            results.push(this.children[0].generate(context)[0]);
+            results = results.concat(this.children[0].generate(context));
         }
         return results;
     }
-
-/*    public chomp(node1: INode, node2: INode): INode {
-        console.log("chomping triggered for repeat");
-        this.children = [node1, node2];
-        return this;
-    }*/
 }

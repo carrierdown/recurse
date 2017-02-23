@@ -1,4 +1,2 @@
 $myVar=(4 8 4)
-rm($myVar $myVar $myVar $myVar) ns(c3) pitch($myVar)
-// todo: repeat should handle more than one element, so that above code can read rm($myVar x4) instead.
-// decision: should variables be case sensitive?
+rm($myVar x4) ns(c3) pitch($myVar)

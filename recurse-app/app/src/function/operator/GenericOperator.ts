@@ -56,6 +56,7 @@ export class GenericOperator implements INode {
                 break;
             case TokenType.DOUBLE_PERIOD:
                 newNode = new Range(parent, true);
+                if (node2.type === Entity.NESTED && node2['head'] )
                 break;
             case TokenType.RIGHT_ANGLE:
                 newNode = new Interpolate(parent);
