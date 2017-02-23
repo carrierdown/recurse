@@ -45,8 +45,8 @@ var selectStrategies = [
     },
 ];
 
-export var SelectStrategyTable: Array<(numResults: number, indexList: Array<number>) => Array<number>> =
-    createLookupTable<(numResults: number, indexList: Array<number>) => Array<number>>(selectStrategies, 'strategy', 'implementation');
+export var SelectStrategyTable: Array<(numResults: number, indexList: number[]) => number[]> =
+    createLookupTable<(numResults: number, indexList: number[]) => number[]>(selectStrategies, 'strategy', 'implementation');
 
 function selectEven(numResults: number, indexList: Array<number> = []): Array<number> {
     var n: number = Math.floor(numResults / 2),

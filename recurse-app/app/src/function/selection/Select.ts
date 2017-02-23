@@ -29,8 +29,30 @@ export class Select implements INode {
             params.push(result.value);
         });
 
-        // discards any previous selection
-        context.selectedIndexes = SelectStrategyTable[this.strategy](context.results.length, params);
+        var selectionStates: boolean[] = [];
+        for (let i = 0; i < context.results.length; i++) {
+            selectionStates[i] = false;
+        }
+        if (context.selectionActive && context.selectedIndexes.length > 0) {
+            for (let i = 0; i < context.selectedIndexes.length; i++) {
+                selectionStates[context.selectedIndexes[i]] = true;
+            }
+        }
+
+        var n: number = Math.floor(selectionStates.length / 2),
+            result: Array<number> = [];
+
+        for (var i = 0; i < n; i++) {
+            result.push(i * 2 + 1);
+        }
+        return result;
+
+        // todo: redo this - atm we won't get correct indices for stacked selections
+        if (context.selectionActive && context.selectedIndexes.length > 0) {
+            context.selectedIndexes = SelectStrategyTable[this.strategy](context.selectedIndexes.length, params);
+        } else {
+            context.selectedIndexes = SelectStrategyTable[this.strategy](context.results.length, params);
+        }
 
         if (context.selectedIndexes.length > 0) {
             context.selectionActive = true;

@@ -344,7 +344,7 @@ export class Parser {
                         if (tokenSet[i].isolatedLeft) {
                             current.children.push(Parser.createNode(Entity.NESTED, current, -1));
                         } else {
-                            current.children[current.children.length - 1] = Parser.createNode(Entity.NESTED, current, lastChild.value);
+                            current.children[current.children.length - 1] = new Nested(null, current, lastChild);
                         }
                         current = _.last(current.children);
                         break;
