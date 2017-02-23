@@ -68,9 +68,8 @@ tape('Testing compiler with valid code', (test) => {
         }
     }, () => {
         test.end();
-    }, 'selectAdditive.rse');
+    }/*, 'selectAdditive.rse'*/);
 });
-
 
 tape('Testing compiler with invalid code', (test) => {
     var compiler: Compiler = new Compiler(),

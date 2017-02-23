@@ -9,15 +9,6 @@ export enum SelectStrategy {
     indexList
 }
 
-/*export var SelectStrategyTable: Array<Function> = [
-    selectEven,
-    selectOdd,
-    selectFirst,
-    selectLast,
-    selectEvery,
-    selectByIndexList
-];*/
-
 var selectStrategies = [
     {
         strategy: SelectStrategy.even,
@@ -45,57 +36,65 @@ var selectStrategies = [
     },
 ];
 
-export var SelectStrategyTable: Array<(numResults: number, indexList: number[]) => number[]> =
-    createLookupTable<(numResults: number, indexList: number[]) => number[]>(selectStrategies, 'strategy', 'implementation');
+export var SelectStrategyTable: Array<(selectionIndices: number[], indexList: number[]) => number[]> =
+    createLookupTable<(selectionIndices: number[], indexList: number[]) => number[]>(selectStrategies, 'strategy', 'implementation');
 
-function selectEven(numResults: number, indexList: Array<number> = []): Array<number> {
-    var n: number = Math.floor(numResults / 2),
-        result: Array<number> = [];
+function selectEven(selectionIndices: number[], indexList: number[] = []): number[] {
+    var n: number = Math.floor(selectionIndices.length / 2),
+        result: number[] = [];
 
     for (var i = 0; i < n; i++) {
-        result.push(i * 2 + 1);
+        let ix = i * 2 + 1;
+        if (ix >= selectionIndices.length) {
+            throw new Error("Selection index is outside of range");
+        }
+        result.push(selectionIndices[ix]);
     }
     return result;
 }
 
-function selectOdd(numResults: number, indexList: Array<number> = []): Array<number> {
-    var n: number = Math.floor(numResults / 2),
-        rem: number = numResults % 2,
-        result: Array<number> = [];
+function selectOdd(selectionIndices: number[], indexList: number[] = []): number[] {
+    var n: number = Math.floor(selectionIndices.length / 2),
+        rem: number = selectionIndices.length % 2,
+        result: number[] = [];
 
     for (var i = 0; i < n + rem; i++) {
-        result.push(i * 2);
+        let ix = i * 2;
+        if (ix >= selectionIndices.length) {
+            throw new Error("Selection index is outside of range");
+        }
+        result.push(selectionIndices[ix]);
     }
     return result;
 }
 
-function selectFirst(numResults: number, indexList: Array<number> = []): Array<number> {
-    return (numResults > 0 ? [0] : []);
+function selectFirst(selectionIndices: number[], indexList: number[] = []): number[] {
+    return (selectionIndices.length > 0 ? [selectionIndices[0]] : []);
 }
 
-function selectLast(numResults: number, indexList: Array<number> = []): Array<number> {
-    return (numResults > 0 ? [numResults - 1] : []);
+function selectLast(selectionIndices: number[], indexList: number[] = []): number[] {
+    return (selectionIndices.length > 0 ? [selectionIndices[selectionIndices.length - 1]] : []);
 }
 
-function selectEvery(numResults: number, indexList: Array<number> = []) {
+function selectEvery(selectionIndices: number[], indexList: number[] = []) {
     //todo: impl
 
 }
 
-function selectByIndexList(numResults: number, indexList: Array<number> = []) {
-    var results: Array<number> = [];
+function selectByIndexList(selectionIndices: number[], indexList: number[] = []) {
+    var results: number[] = [];
 
     if (indexList.length === 0) return;
 
     for (let index of indexList) {
         if (index > 0) {
-            index--;
+            index--; // convert to zero-based index
         } else {
-            index = 0;
+            index = 0; // sanity
         }
         // only allow unique indexes within range
-        if (index < numResults && results.indexOf(index) < 0) {
-            results.push(index);
+        if (index < selectionIndices.length && results.indexOf(selectionIndices[index]) < 0) {
+            results.push(selectionIndices[index]);
         }
     }
     return results;

@@ -22,37 +22,22 @@ export class Select implements INode {
         var results: Array<IRecurseValue> = [],
             params: Array<number> = [];
 
-        _.forEach(this.children, (child) => {
+        for (let child of this.children) {
             results = results.concat(child.generate(context));
-        });
-        _.forEach(results, (result: IRecurseValue) => {
-            params.push(result.value);
-        });
-
-        var selectionStates: boolean[] = [];
-        for (let i = 0; i < context.results.length; i++) {
-            selectionStates[i] = false;
         }
+        for (let result of results) { // argument list, e.g. selection index
+            params.push(result.value);
+        }
+
+        var selectionIndices: number[] = [];
         if (context.selectionActive && context.selectedIndexes.length > 0) {
-            for (let i = 0; i < context.selectedIndexes.length; i++) {
-                selectionStates[context.selectedIndexes[i]] = true;
+            selectionIndices = context.selectedIndexes;
+        } else {
+            for (let i = 0; i < context.results.length; i++) {
+                selectionIndices[i] = i;
             }
         }
-
-        var n: number = Math.floor(selectionStates.length / 2),
-            result: Array<number> = [];
-
-        for (var i = 0; i < n; i++) {
-            result.push(i * 2 + 1);
-        }
-        return result;
-
-        // todo: redo this - atm we won't get correct indices for stacked selections
-        if (context.selectionActive && context.selectedIndexes.length > 0) {
-            context.selectedIndexes = SelectStrategyTable[this.strategy](context.selectedIndexes.length, params);
-        } else {
-            context.selectedIndexes = SelectStrategyTable[this.strategy](context.results.length, params);
-        }
+        context.selectedIndexes = SelectStrategyTable[this.strategy](selectionIndices, params);
 
         if (context.selectedIndexes.length > 0) {
             context.selectionActive = true;

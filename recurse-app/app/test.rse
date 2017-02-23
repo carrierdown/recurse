@@ -1,2 +1,1 @@
-$myVar=(8 8)
-rm($myVar x4) ns(c3)
+length(32) rm(4 4 8 16) ns(c3) even even pitch(12)
