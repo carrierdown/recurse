@@ -6,6 +6,7 @@ import {INode} from "../../interpreter/INode";
 import {IContext} from "../IContext";
 import {Entity} from "../../interpreter/Entity";
 import {ValueType} from "../../interpreter/ValueType";
+import {Value} from "./Value";
 
 export class Nested implements INode {
     public type: Entity = Entity.NESTED;
@@ -16,6 +17,11 @@ export class Nested implements INode {
     public head: INode;
 
     constructor(value: number = -1, parent: INode = null, head: INode = null) {
+/* todo: always use head value rather than value - more flexible wrt notes and so on
+        if (this.head === null && this.value > 0) {
+            this.head = new Value(this.value, this, ValueType.INTERVAL)
+        }
+*/
         this.value = value;
         this.parent = parent;
         this.children = [];
@@ -57,7 +63,7 @@ export class Nested implements INode {
         }
 
         /*
-        // todo: if we want to support FILL inside nested statements as well...
+        // todo: if we want to support FILL inside nested statements as well... Idea: if * is present in nested, do not rescale values but let head value control length instead of scaling
          // If we have a FILL element, figure out its size and set it
          let fillNodeIndex = _.findIndex(results, ['valueType', ValueType.FILL]);
          if (fillNodeIndex > -1) {
@@ -68,45 +74,99 @@ export class Nested implements INode {
          }
         */
 
-        let doScaleValues: boolean = (this.value > 0);
 
-        if (results.length > 0 && results[0].valueType === ValueType.INTERVAL || results[0].valueType === ValueType.REST) {
-            if (doScaleValues) {
-                let sum: number = 0;
-                for (let result of results) {
-                    sum += result.value;
-                }
-
-                for (let i = 0; i < results.length; i++) {
-                    results[i].value = (results[i].value / sum) * this.value;
-                }
+        if (this.head) {
+            let headValues = [];
+            for (let child of this.head.children) {
+                headValues = headValues.concat(child.generate(context));
             }
+            for (let headValue of headValues) {
+                // todo: straight up duplication, obviously refactor...
+                let value = headValue.value;
+                let doScaleValues: boolean = (value > 0);
 
-            for (let associatedNode of this.associatedNodes) {
-                let associatedResults: IRecurseValue[] = [],
-                    i: number = 0;
-                for (let result of results) {
-                    if (i >= associatedResults.length) {
-                        associatedResults = associatedNode.generate(context);
-                        i = 0;
-                    }
-                    if (!result.additionalValues) {
-                        result.additionalValues = [];
-                    }
-                    let additionalValueOfTypeAlreadyAdded = false;
-                    for (let additionalValue of result.additionalValues) {
-                        if (additionalValue.valueType === associatedResults[i].valueType) {
-                            additionalValueOfTypeAlreadyAdded = true;
-                            break;
+                if (results.length > 0 && results[0].valueType === ValueType.INTERVAL || results[0].valueType === ValueType.REST) {
+                    if (doScaleValues) {
+                        let sum: number = 0;
+                        for (let result of results) {
+                            sum += result.value;
+                        }
+
+                        for (let i = 0; i < results.length; i++) {
+                            results[i].value = (results[i].value / sum) * value;
                         }
                     }
-                    if (!additionalValueOfTypeAlreadyAdded) {
-                        result.additionalValues.push({value: associatedResults[i].value, valueType: associatedResults[i].valueType});
+
+                    for (let associatedNode of this.associatedNodes) {
+                        let associatedResults: IRecurseValue[] = [],
+                            i: number = 0;
+                        for (let result of results) {
+                            if (i >= associatedResults.length) {
+                                associatedResults = associatedNode.generate(context);
+                                i = 0;
+                            }
+                            if (!result.additionalValues) {
+                                result.additionalValues = [];
+                            }
+                            let additionalValueOfTypeAlreadyAdded = false;
+                            for (let additionalValue of result.additionalValues) {
+                                if (additionalValue.valueType === associatedResults[i].valueType) {
+                                    additionalValueOfTypeAlreadyAdded = true;
+                                    break;
+                                }
+                            }
+                            if (!additionalValueOfTypeAlreadyAdded) {
+                                result.additionalValues.push({value: associatedResults[i].value, valueType: associatedResults[i].valueType});
+                            }
+                            i++;
+                        }
+                        if (associatedNode.reset) {
+                            associatedNode.reset();
+                        }
                     }
-                    i++;
                 }
-                if (associatedNode.reset) {
-                    associatedNode.reset();
+            }
+        } else {
+            let doScaleValues: boolean = (this.value > 0);
+
+            if (results.length > 0 && results[0].valueType === ValueType.INTERVAL || results[0].valueType === ValueType.REST) {
+                if (doScaleValues) {
+                    let sum: number = 0;
+                    for (let result of results) {
+                        sum += result.value;
+                    }
+
+                    for (let i = 0; i < results.length; i++) {
+                        results[i].value = (results[i].value / sum) * this.value;
+                    }
+                }
+
+                for (let associatedNode of this.associatedNodes) {
+                    let associatedResults: IRecurseValue[] = [],
+                        i: number = 0;
+                    for (let result of results) {
+                        if (i >= associatedResults.length) {
+                            associatedResults = associatedNode.generate(context);
+                            i = 0;
+                        }
+                        if (!result.additionalValues) {
+                            result.additionalValues = [];
+                        }
+                        let additionalValueOfTypeAlreadyAdded = false;
+                        for (let additionalValue of result.additionalValues) {
+                            if (additionalValue.valueType === associatedResults[i].valueType) {
+                                additionalValueOfTypeAlreadyAdded = true;
+                                break;
+                            }
+                        }
+                        if (!additionalValueOfTypeAlreadyAdded) {
+                            result.additionalValues.push({value: associatedResults[i].value, valueType: associatedResults[i].valueType});
+                        }
+                        i++;
+                    }
+                    if (associatedNode.reset) {
+                        associatedNode.reset();
+                    }
                 }
             }
         }

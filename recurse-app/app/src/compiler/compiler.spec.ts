@@ -68,7 +68,7 @@ tape('Testing compiler with valid code', (test) => {
         }
     }, () => {
         test.end();
-    }/*, 'selectAdditive.rse'*/);
+    }, 'nestedWithRangeHead.rse');
 });
 
 tape('Testing compiler with invalid code', (test) => {

@@ -344,7 +344,7 @@ export class Parser {
                         if (tokenSet[i].isolatedLeft) {
                             current.children.push(Parser.createNode(Entity.NESTED, current, -1));
                         } else {
-                            current.children[current.children.length - 1] = new Nested(null, current, lastChild);
+                            current.children[current.children.length - 1] = new Nested(-1, current, lastChild);
                         }
                         current = _.last(current.children);
                         break;
@@ -585,6 +585,11 @@ export class Parser {
         if (node['name']) {
             output += `
             ${indent}  name:      ${node['name']}`;
+        }
+
+        if (node['head']) {
+            output += `
+            ${indent}  - head:      ${Parser.printSyntaxNode(node['head'], level + 2)}`;
         }
 
         if (node['valueType']) {

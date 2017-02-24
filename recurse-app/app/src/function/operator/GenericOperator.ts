@@ -55,8 +55,18 @@ export class GenericOperator implements INode {
                 newNode = new Repeat(parent, true);
                 break;
             case TokenType.DOUBLE_PERIOD:
+                if (node1.type === Entity.VALUE && node2.type === Entity.NESTED) {
+                    if (!node2.hasOwnProperty('head')) {
+                        throw new Error("Range operator can not be used with anonymous nested block");
+                    }
+                    newNode = node2;
+                    let newNode2 = node2['head'];
+                    let newRangeNode = new Range(newNode, true);
+                    newRangeNode.children = [node1, newNode2];
+                    newNode['head'] = newRangeNode;
+                    return newNode;
+                }
                 newNode = new Range(parent, true);
-                if (node2.type === Entity.NESTED && node2['head'] )
                 break;
             case TokenType.RIGHT_ANGLE:
                 newNode = new Interpolate(parent);

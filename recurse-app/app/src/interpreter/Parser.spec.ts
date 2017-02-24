@@ -59,6 +59,13 @@ tape('Should be possible to assign a block to a variable', (test) => {
     test.end();
 });
 
+tape('Should be possible to use a shorthand expression as the head of a nested block', (test) => {
+    parseAndCheckAgainst("rm(2..4(1x2))", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.RANGE_SHORTHAND], test);
+    test.end();
+});
+
+// rm(2..4(1x2)) ns(c3) // expecting intervals: 1 1 1.5 1.5 2 2
+
 // todo: Nested should contain a sub node so that it supports more complex values than simply numbers which is the case today. This means an interpolate statement could be the sum of a nested expr.
 /*
 tape('Interpolate statements should be supported as the sum of a nested block', (test) => {
