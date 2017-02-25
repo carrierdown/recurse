@@ -60,7 +60,7 @@ tape('Should be possible to assign a block to a variable', (test) => {
 });
 
 tape('Should be possible to use a shorthand expression as the head of a nested block', (test) => {
-    parseAndCheckAgainst("rm(2..4(1x2))", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.RANGE_SHORTHAND], test);
+    parseAndCheckAgainst("rm(2..4(1x2))", [Entity.ROOT, Entity.CHAIN, Entity.RM, Entity.NESTED, Entity.REPEAT_SHORTHAND], test);
     test.end();
 });
 

@@ -58,9 +58,6 @@ export class Nested implements INode {
             //}
         }
 
-        for (let child of this.children) {
-            results = results.concat(child.generate(context));
-        }
 
         /*
         // todo: if we want to support FILL inside nested statements as well... Idea: if * is present in nested, do not rescale values but let head value control length instead of scaling
@@ -74,16 +71,19 @@ export class Nested implements INode {
          }
         */
 
+        let totalResults = [];
 
         if (this.head) {
-            let headValues = [];
-            for (let child of this.head.children) {
-                headValues = headValues.concat(child.generate(context));
-            }
+            let headValues = this.head.generate(context);
             for (let headValue of headValues) {
                 // todo: straight up duplication, obviously refactor...
                 let value = headValue.value;
                 let doScaleValues: boolean = (value > 0);
+                // Note: By doing generation for each occurence, we are saying that e.g. 1..3(4'5'6 3) would be equal to 1(4 3) 2(5 3) 3(6 3)
+                //       rather than 1(4 3) 2(4 3) 3(4 3).
+                for (let child of this.children) {
+                    results = results.concat(child.generate(context));
+                }
 
                 if (results.length > 0 && results[0].valueType === ValueType.INTERVAL || results[0].valueType === ValueType.REST) {
                     if (doScaleValues) {
@@ -125,9 +125,14 @@ export class Nested implements INode {
                         }
                     }
                 }
+                totalResults = totalResults.concat(results);
+                results = [];
             }
         } else {
             let doScaleValues: boolean = (this.value > 0);
+            for (let child of this.children) {
+                results = results.concat(child.generate(context));
+            }
 
             if (results.length > 0 && results[0].valueType === ValueType.INTERVAL || results[0].valueType === ValueType.REST) {
                 if (doScaleValues) {
@@ -169,8 +174,9 @@ export class Nested implements INode {
                     }
                 }
             }
+            totalResults = totalResults.concat(results);
         }
-        return results;
+        return totalResults;
     }
 
     private addAssociatedNodeOfType(entity: Entity, parent: INode, path: number[]): void {
