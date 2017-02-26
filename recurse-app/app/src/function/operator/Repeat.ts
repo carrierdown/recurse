@@ -23,7 +23,7 @@ export class Repeat implements INode {
         }
 
         // Swap arguments if they are obviously in the wrong order
-        if (this.children[0].type === Entity.NESTED && this.children[1].type === Entity.VALUE) {
+        if (this.children[0].type === Entity.VALUE && this.children[1].type === Entity.NESTED) {
             [this.children[0], this.children[1]] = [this.children[1], this.children[0]];
         }
 

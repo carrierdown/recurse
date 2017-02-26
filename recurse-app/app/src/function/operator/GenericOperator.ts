@@ -69,10 +69,21 @@ export class GenericOperator implements INode {
                 newNode = new Range(parent, true);
                 break;
             case TokenType.RIGHT_ANGLE:
+                if (node1.type === Entity.VALUE && node2.type === Entity.NESTED) {
+                    if (!node2.hasOwnProperty('head')) {
+                        throw new Error("Interpolate operator can not be used with anonymous nested block");
+                    }
+                    newNode = node2;
+                    let newNode2 = node2['head'];
+                    let newInterpolateNode = new Interpolate(newNode);
+                    newInterpolateNode.children = [node1, newNode2];
+                    newNode['head'] = newInterpolateNode;
+                    return newNode;
+                }
                 newNode = new Interpolate(parent);
                 break;
             default:
-                throw Error(`Transform: Found no matches for ${TokenType[this.operatorToken]}`);
+                throw new Error(`Transform: Found no matches for ${TokenType[this.operatorToken]}`);
         }
         newNode.children = [node1, node2];
         return newNode;
