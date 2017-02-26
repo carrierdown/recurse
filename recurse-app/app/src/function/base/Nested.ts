@@ -10,19 +10,12 @@ import {Value} from "./Value";
 
 export class Nested implements INode {
     public type: Entity = Entity.NESTED;
-    public value: number;
     public children: INode[];
     public parent: INode;
     public associatedNodes: INode[];
     public head: INode;
 
-    constructor(value: number = -1, parent: INode = null, head: INode = null) {
-/* todo: always use head value rather than value - more flexible wrt notes and so on
-        if (this.head === null && this.value > 0) {
-            this.head = new Value(this.value, this, ValueType.INTERVAL)
-        }
-*/
-        this.value = value;
+    constructor(parent: INode = null, head: INode = null) {
         this.parent = parent;
         this.children = [];
         this.associatedNodes = [];
@@ -30,11 +23,9 @@ export class Nested implements INode {
     }
 
     public generate(context: IContext): Array<IRecurseValue> {
-        var results: IRecurseValue[] = [];
-
         // Is this node contained by an rm?
         // if so - create path to here, counting only structural nodes like nested
-        let parentRm: INode = Parser.getParentNodeOfType(Entity.RM, this);
+        var parentRm: INode = Parser.getParentNodeOfType(Entity.RM, this);
         if (parentRm !== null && !context.prePhase) {
             let path: number[] = [],
                 node: INode = this;
@@ -52,13 +43,7 @@ export class Nested implements INode {
 
             this.addAssociatedNodeOfType(Entity.NS, parentRm, path);
             this.addAssociatedNodeOfType(Entity.VEL, parentRm, path);
-
-            //if (targetNode.type === Entity.NESTED) {
-            //    console.log('with first sub value', targetNode.children[0]['value']);
-            //}
         }
-
-
         /*
         // todo: if we want to support FILL inside nested statements as well... Idea: if * is present in nested, do not rescale values but let head value control length instead of scaling
          // If we have a FILL element, figure out its size and set it
@@ -71,110 +56,17 @@ export class Nested implements INode {
          }
         */
 
-        let totalResults = [];
+        var totalResults = [];
 
         if (this.head) {
             let headValues = this.head.generate(context);
             for (let headValue of headValues) {
-                // todo: straight up duplication, obviously refactor...
-                let value = headValue.value;
-                let doScaleValues: boolean = (value > 0);
                 // Note: By doing generation for each occurence, we are saying that e.g. 1..3(4'5'6 3) would be equal to 1(4 3) 2(5 3) 3(6 3)
                 //       rather than 1(4 3) 2(4 3) 3(4 3).
-                for (let child of this.children) {
-                    results = results.concat(child.generate(context));
-                }
-
-                if (results.length > 0 && results[0].valueType === ValueType.INTERVAL || results[0].valueType === ValueType.REST) {
-                    if (doScaleValues) {
-                        let sum: number = 0;
-                        for (let result of results) {
-                            sum += result.value;
-                        }
-
-                        for (let i = 0; i < results.length; i++) {
-                            results[i].value = (results[i].value / sum) * value;
-                        }
-                    }
-
-                    for (let associatedNode of this.associatedNodes) {
-                        let associatedResults: IRecurseValue[] = [],
-                            i: number = 0;
-                        for (let result of results) {
-                            if (i >= associatedResults.length) {
-                                associatedResults = associatedNode.generate(context);
-                                i = 0;
-                            }
-                            if (!result.additionalValues) {
-                                result.additionalValues = [];
-                            }
-                            let additionalValueOfTypeAlreadyAdded = false;
-                            for (let additionalValue of result.additionalValues) {
-                                if (additionalValue.valueType === associatedResults[i].valueType) {
-                                    additionalValueOfTypeAlreadyAdded = true;
-                                    break;
-                                }
-                            }
-                            if (!additionalValueOfTypeAlreadyAdded) {
-                                result.additionalValues.push({value: associatedResults[i].value, valueType: associatedResults[i].valueType});
-                            }
-                            i++;
-                        }
-                        if (associatedNode.reset) {
-                            associatedNode.reset();
-                        }
-                    }
-                }
-                totalResults = totalResults.concat(results);
-                results = [];
+                totalResults = totalResults.concat(this.generateValues(context, headValue.value));
             }
         } else {
-            let doScaleValues: boolean = (this.value > 0);
-            for (let child of this.children) {
-                results = results.concat(child.generate(context));
-            }
-
-            if (results.length > 0 && results[0].valueType === ValueType.INTERVAL || results[0].valueType === ValueType.REST) {
-                if (doScaleValues) {
-                    let sum: number = 0;
-                    for (let result of results) {
-                        sum += result.value;
-                    }
-
-                    for (let i = 0; i < results.length; i++) {
-                        results[i].value = (results[i].value / sum) * this.value;
-                    }
-                }
-
-                for (let associatedNode of this.associatedNodes) {
-                    let associatedResults: IRecurseValue[] = [],
-                        i: number = 0;
-                    for (let result of results) {
-                        if (i >= associatedResults.length) {
-                            associatedResults = associatedNode.generate(context);
-                            i = 0;
-                        }
-                        if (!result.additionalValues) {
-                            result.additionalValues = [];
-                        }
-                        let additionalValueOfTypeAlreadyAdded = false;
-                        for (let additionalValue of result.additionalValues) {
-                            if (additionalValue.valueType === associatedResults[i].valueType) {
-                                additionalValueOfTypeAlreadyAdded = true;
-                                break;
-                            }
-                        }
-                        if (!additionalValueOfTypeAlreadyAdded) {
-                            result.additionalValues.push({value: associatedResults[i].value, valueType: associatedResults[i].valueType});
-                        }
-                        i++;
-                    }
-                    if (associatedNode.reset) {
-                        associatedNode.reset();
-                    }
-                }
-            }
-            totalResults = totalResults.concat(results);
+            totalResults = totalResults.concat(this.generateValues(context, -1));
         }
         return totalResults;
     }
@@ -206,5 +98,55 @@ export class Nested implements INode {
         if (this.associatedNodes.indexOf(targetNode) < 0) {
             this.associatedNodes.push(targetNode);
         }
+    }
+
+    private generateValues(context: IContext, value: number) {
+        var results = [];
+        let doScaleValues: boolean = (value > 0);
+        for (let child of this.children) {
+            results = results.concat(child.generate(context));
+        }
+
+        if (results.length > 0 && results[0].valueType === ValueType.INTERVAL || results[0].valueType === ValueType.REST) {
+            if (doScaleValues) {
+                let sum: number = 0;
+                for (let result of results) {
+                    sum += result.value;
+                }
+
+                for (let i = 0; i < results.length; i++) {
+                    results[i].value = (results[i].value / sum) * value;
+                }
+            }
+
+            for (let associatedNode of this.associatedNodes) {
+                let associatedResults: IRecurseValue[] = [],
+                    i: number = 0;
+                for (let result of results) {
+                    if (i >= associatedResults.length) {
+                        associatedResults = associatedNode.generate(context);
+                        i = 0;
+                    }
+                    if (!result.additionalValues) {
+                        result.additionalValues = [];
+                    }
+                    let additionalValueOfTypeAlreadyAdded = false;
+                    for (let additionalValue of result.additionalValues) {
+                        if (additionalValue.valueType === associatedResults[i].valueType) {
+                            additionalValueOfTypeAlreadyAdded = true;
+                            break;
+                        }
+                    }
+                    if (!additionalValueOfTypeAlreadyAdded) {
+                        result.additionalValues.push({value: associatedResults[i].value, valueType: associatedResults[i].valueType});
+                    }
+                    i++;
+                }
+                if (associatedNode.reset) {
+                    associatedNode.reset();
+                }
+            }
+        }
+        return results;
     }
 }

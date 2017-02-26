@@ -36,24 +36,12 @@ import {VariableReference} from "../function/base/VariableReference";
 import {Variable} from "../function/base/Variable";
 
 export class Parser {
-    public static get SHORTHAND_TOKENS(): Array<TokenType> {
-        return [TokenType.REPEAT, TokenType.SINGLE_QUOTE, TokenType.UNDERSCORE]
-    }
-
     public static get SHORTHAND_ENTITIES(): Array<Entity> {
         return [Entity.REST_SHORTHAND, Entity.REPEAT_SHORTHAND, Entity.ALT_SHORTHAND, Entity.RANGE_SHORTHAND]
     }
 
     public static get SETTING_ENTITIES(): Array<Entity> {
         return [Entity.PATTERN_LENGTH, Entity.LOOP_FACTOR, Entity.SET_SCALE];
-    }
-
-    public static get COMMA_LEFT_HAND_SIDE_TOKENS(): TokenType[] {
-        return [TokenType.NUMBER, TokenType.NOTE, TokenType.MULTIPLY, TokenType.RIGHT_PAREN];
-    }
-
-    public static get COMMA_RIGHT_HAND_SIDE_TOKENS(): TokenType[] {
-        return [TokenType.NUMBER, TokenType.NOTE, TokenType.MULTIPLY, TokenType.IDENTIFIER, TokenType.UNDERSCORE];
     }
 
     public static tokenSetLookAhead(tokenSet: Array<IToken>, position: number, lookAhead: number): IToken {
@@ -117,7 +105,7 @@ export class Parser {
             case Entity.INTERPOLATE: return new Interpolate(parent);
             case Entity.INTERVAL: return new Value(value, parent, ValueType.INTERVAL);
             case Entity.LAST: return new Select(parent, SelectStrategy.last);
-            case Entity.NESTED: return new Nested(value, parent);
+            case Entity.NESTED: return new Nested(parent);
             case Entity.NOTE: case Entity.RAW_NOTE: return new Value(value, parent, ValueType.NOTE);
             case Entity.NS: return new NoteSet(parent, children);
             case Entity.ODD: return new Select(parent, SelectStrategy.odd);
@@ -230,19 +218,6 @@ export class Parser {
         return node.children[node.children.length - 1];
     }
 
-    public static preProcessTokens(tokenSet: IToken[]): void {
-        if (tokenSet.length < 2) {
-            return;
-        }
-        for (let i = 1; i < tokenSet.length; i++) {
-            if (Parser.COMMA_LEFT_HAND_SIDE_TOKENS.indexOf(tokenSet[i - 1].type) >= 0 &&
-                Parser.COMMA_RIGHT_HAND_SIDE_TOKENS.indexOf(tokenSet[i].type) >= 0) {
-                tokenSet.splice(i, 0, {type: TokenType.COMMA, value: ',', pos: tokenSet[i].pos - 1} as IToken);
-                i++;
-            }
-        }
-    }
-
     // todo: remove RecurseResult stuff and use exceptions instead
     public static parseTokensToSyntaxTree(tokenSet: Array<IToken>): RecurseResult<ISyntaxTree> {
         var current: INode = Parser.createNode(Entity.ROOT, null),
@@ -254,8 +229,6 @@ export class Parser {
                 ErrorMessages.PARENTHESES_DO_NOT_MATCH
             ));
         }
-
-        Parser.preProcessTokens(tokenSet);
 
         syntaxTree.rootNodes[0] = current;
         current = Parser.createAndAddNodeToChildrenAndRetrieve(current, Entity.CHAIN);
@@ -321,7 +294,7 @@ export class Parser {
                     i++; // skip a token since we ate the number following _ operator
                     break;
                 case TokenType.MULTIPLY:
-                    // todo: check that we dont add multiple FILL entities to one parent
+                    // todo: check that we don't add multiple FILL entities to one parent
                     current.children.push(Parser.createNode(Entity.FILL, current));
                     break;
                 case TokenType.LEFT_PAREN:
@@ -344,7 +317,7 @@ export class Parser {
                         if (tokenSet[i].isolatedLeft) {
                             current.children.push(Parser.createNode(Entity.NESTED, current, -1));
                         } else {
-                            current.children[current.children.length - 1] = new Nested(-1, current, lastChild);
+                            current.children[current.children.length - 1] = new Nested(current, lastChild);
                         }
                         current = _.last(current.children);
                         break;
@@ -364,13 +337,6 @@ export class Parser {
                     // current = Parser.exitShorthandStatements(current);
                     // no children on current node is not necessarily an error (could be an empty func())
                     current = current.parent;
-                    break;
-                case TokenType.COMMA:
-                    // if we're in a chain, the comma breaks it
-                    //if (current.type === Entity.CHAIN) {
-                    //    current = current.parent;
-                    //}
-                    // current = Parser.exitShorthandStatements(current);
                     break;
                 case TokenType.PIPE: // experimental: | now signifies what ; used to mean earlier
                     if (current.type !== Entity.CHAIN) {
@@ -502,14 +468,6 @@ export class Parser {
         }
     }
 
-    // todo remove
-    private static exitShorthandStatements(current: INode): INode {
-        while (Parser.isShorthandEntity(current.type)) {
-            current = current.parent;
-        }
-        return current;
-    }
-
     public static getParentNodeOfType(entity: Entity, node: INode): INode {
         var current: INode = null;
         if (node.type === entity) {
@@ -535,18 +493,6 @@ export class Parser {
         return current;
     }
 
-    // todo remove
-    private static isTerminatingToken(token: TokenType): boolean {
-        return token === TokenType.COMMA || token === TokenType.RIGHT_PAREN; // || tokenName === 'PIPE';
-    }
-
-    // determines whether the given token forms part of a shorthand definition such as 3;4;5 or 3*3,
-    // which would be shorthand for alt(3,4,5) and rep(3,3) respectively.
-    // todo remove
-    private static isShortHandToken(token: TokenType): boolean {
-        return Parser.SHORTHAND_TOKENS.indexOf(token) >= 0;
-    }
-
     private static isShorthandEntity(entityType: Entity): boolean {
         return Parser.SHORTHAND_ENTITIES.indexOf(entityType) >= 0
     }
@@ -561,10 +507,6 @@ export class Parser {
             syntaxTreeOutput += Parser.printSyntaxNode(syntaxTree.variables[varNode] as INode, 0);
         }
         console.log(syntaxTreeOutput);
-    }
-
-    private static hasChildren(node: INode): boolean {
-        return node.children.length > 0;
     }
 
     private static printSyntaxNode(node: INode, level): string {

@@ -24,7 +24,6 @@ function parseAndCheckAgainst(input: string, expectedEntities: Entity[], test) {
 
     if (!parsed.isOk()) {
         test.fail(parsed.error);
-        test.end();
         return;
     }
     var entities: Entity[] = [];

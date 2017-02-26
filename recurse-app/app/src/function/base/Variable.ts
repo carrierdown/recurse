@@ -25,6 +25,9 @@ export class Variable implements INode {
     }
 
     public generateVar(context: IContext, parent: INode): IRecurseValue[] {
+        // Setting parent on generation feels slightly wrong, but since we want to use actual references to our variables
+        // and not just duplicating everything every time something is referenced, we need to keep track of the ancestor
+        // tree somehow, otherwise the type system will be confused.
         this.parent = parent;
         var results: IRecurseValue[] = this.generate(context);
         this.parent = null;
