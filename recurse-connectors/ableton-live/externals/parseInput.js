@@ -144,15 +144,10 @@ function set_json(jsonString) {
 function get_intervals(strategy) {
     var clip = new Clip(),
         noteList = clip.getNotes(),
-        clipLength = clip.getLength(),
-        results = [{ intervals: [], notes: [], velocities: [] }],
-        currentResultIndex = 0,
-        currentStartPos,
-        currentEndPos,
-        backlog,
-        output = "",
-        velocitiesNeeded = false;
-    strategy = strategy || 0;
+        clipLength = clip.getLength();
+
+    if (strategy === void 0) { strategy = 0; }
+    var results = [{ intervals: [], notes: [], velocities: [] }], currentResultIndex = 0, currentStartPos, currentEndPos, backlog, output = "", velocitiesNeeded = false;
 
     noteList.sort(function (a, b) {
         if (a.start > b.start) {
@@ -233,7 +228,7 @@ function get_intervals(strategy) {
             }
         }
         if (totalLength > 0) {
-            rmOutput += ",_" + totalLength;
+            rmOutput += " _" + totalLength;
         }
         output += "rm(" + rmOutput + ") ";
         var noteOutput = "";

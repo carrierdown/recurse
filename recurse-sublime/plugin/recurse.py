@@ -24,9 +24,23 @@ def plugin_loaded():
 def plugin_unloaded():
 	osc_terminate()
 
-class RecurseCommand(sublime_plugin.TextCommand):
+class GetclipdrumCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
-		msg = oscbuildparse.OSCMessage("/recurse/getintervals", None, [])
+		msg = oscbuildparse.OSCMessage("/recurse/getintervalsdrum", None, [])
+		osc_send(msg, "sender")
+
+		targettime = time.time() + 1
+		while time.time() < targettime and a.value == "":
+			osc_process()
+
+		for pos in self.view.sel():
+			self.view.insert(edit, pos.begin(), a.value)
+
+		a.value = "";
+
+class GetclipcompactCommand(sublime_plugin.TextCommand):
+	def run(self, edit):
+		msg = oscbuildparse.OSCMessage("/recurse/getintervalscompact", None, [])
 		osc_send(msg, "sender")
 
 		targettime = time.time() + 1
