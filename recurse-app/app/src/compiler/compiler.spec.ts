@@ -68,7 +68,7 @@ tape('Testing compiler with valid code', (test) => {
         }
     }, () => {
         test.end();
-    }/*, 'comments.rse'*/);
+    }/*, 'variablesWithNested.rse'*/);
 });
 
 tape('Testing compiler with invalid code', (test) => {

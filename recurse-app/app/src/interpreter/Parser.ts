@@ -319,6 +319,7 @@ export class Parser {
                             current.children.push(Parser.createNode(Entity.NESTED, current, -1));
                         } else {
                             current.children[current.children.length - 1] = new Nested(current, lastChild);
+                            lastChild.parent = current.children[current.children.length - 1];
                         }
                         current = _.last(current.children);
                         break;

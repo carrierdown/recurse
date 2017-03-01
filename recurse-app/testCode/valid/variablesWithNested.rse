@@ -1,0 +1,3 @@
+$myVar=(16(4 8 4)x4)
+$myVar2=(16(4 8 4))
+rm($myVar) ns(c3) pitch($myVar2)

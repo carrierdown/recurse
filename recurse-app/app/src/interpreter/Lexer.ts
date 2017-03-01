@@ -163,6 +163,13 @@ export class Lexer {
             c === '_' || c === '$' || c === '+';
     }
 
+    static isValidVariableCharacter(c): boolean {
+        return (c >= 'a' && c <= 'z') ||
+            (c >= 'A' && c <= 'Z') ||
+            c === '_' || c === '$' ||
+            (c >= '0' && c <= '9');
+    }
+
     static isNote(c1, c2): boolean {
         return ((c1 >= 'a' && c1 <= 'g') ||
             (c1 >= 'A' && c1 <= 'G')) &&
@@ -258,7 +265,7 @@ export class Lexer {
     private processVariableName(): IToken {
         var endpos = this.position + 1;
         while (endpos < this.bufferLength &&
-        Lexer.isAlpha(this.buffer.charAt(endpos))) {
+        Lexer.isValidVariableCharacter(this.buffer.charAt(endpos))) {
             endpos++;
         }
 

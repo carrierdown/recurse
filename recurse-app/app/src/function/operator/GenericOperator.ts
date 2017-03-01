@@ -76,6 +76,8 @@ export class GenericOperator implements INode {
             default:
                 throw new Error(`Transform: Found no matches for ${TokenType[this.operatorToken]}`);
         }
+        node1.parent = node2.parent = newNode;
+
         newNode.children = [node1, node2];
         return newNode;
     }
@@ -101,6 +103,7 @@ export class GenericOperator implements INode {
                 throw new Error(`GenericOperator.mergeWithHead failed to find match for ${Entity[entity]}`);
         }
         newHeadNode.children = [node1, currentHeadNode];
+        node1.parent = currentHeadNode.parent = newHeadNode;
         result['head'] = newHeadNode;
         return result;
     }
