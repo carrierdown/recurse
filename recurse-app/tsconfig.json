@@ -51,6 +51,7 @@
         "app/src/function/operator/GenericOperator.ts",
         "app/src/function/operator/Interpolate.spec.ts",
         "app/src/function/operator/Interpolate.ts",
+        "app/src/function/operator/Multiply.ts",
         "app/src/function/operator/Random.ts",
         "app/src/function/operator/Range.ts",
         "app/src/function/operator/Repeat.ts",

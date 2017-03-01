@@ -10,6 +10,7 @@ import {Repeat} from "./Repeat";
 import {Interpolate} from "./Interpolate";
 import {Range} from "./Range";
 import {Entity} from "../../interpreter/Entity";
+import {Multiply} from "./Multiply";
 
 export class GenericOperator implements INode {
     public type: Entity;
@@ -54,31 +55,21 @@ export class GenericOperator implements INode {
             case TokenType.REPEAT:
                 newNode = new Repeat(parent, true);
                 break;
+            case TokenType.MULTIPLY:
+                if (node1.type === Entity.VALUE && node2.type === Entity.NESTED) {
+                    return this.mergeWithHead(node1, node2, Entity.MULTIPLY);
+                }
+                newNode = new Multiply(parent);
+                break;
             case TokenType.DOUBLE_PERIOD:
                 if (node1.type === Entity.VALUE && node2.type === Entity.NESTED) {
-                    if (!node2.hasOwnProperty('head')) {
-                        throw new Error("Range operator can not be used with anonymous nested block");
-                    }
-                    newNode = node2;
-                    let newNode2 = node2['head'];
-                    let newRangeNode = new Range(newNode, true);
-                    newRangeNode.children = [node1, newNode2];
-                    newNode['head'] = newRangeNode;
-                    return newNode;
+                    return this.mergeWithHead(node1, node2, Entity.RANGE_SHORTHAND);
                 }
                 newNode = new Range(parent, true);
                 break;
             case TokenType.RIGHT_ANGLE:
                 if (node1.type === Entity.VALUE && node2.type === Entity.NESTED) {
-                    if (!node2.hasOwnProperty('head')) {
-                        throw new Error("Interpolate operator can not be used with anonymous nested block");
-                    }
-                    newNode = node2;
-                    let newNode2 = node2['head'];
-                    let newInterpolateNode = new Interpolate(newNode);
-                    newInterpolateNode.children = [node1, newNode2];
-                    newNode['head'] = newInterpolateNode;
-                    return newNode;
+                    return this.mergeWithHead(node1, node2, Entity.INTERPOLATE);
                 }
                 newNode = new Interpolate(parent);
                 break;
@@ -87,5 +78,30 @@ export class GenericOperator implements INode {
         }
         newNode.children = [node1, node2];
         return newNode;
+    }
+
+    private mergeWithHead(node1: INode, node2: INode, entity: Entity): INode {
+        if (!node2.hasOwnProperty('head')) {
+            throw new Error(`${Entity[entity]} operator can not be used with anonymous nested block`);
+        }
+        var result = node2,
+            currentHeadNode = node2['head'];
+        var newHeadNode;
+        switch (entity) {
+            case Entity.RANGE_SHORTHAND:
+                newHeadNode = new Range(result, true);
+                break;
+            case Entity.INTERPOLATE:
+                newHeadNode = new Interpolate(result);
+                break;
+            case Entity.MULTIPLY:
+                newHeadNode = new Multiply(result);
+                break;
+            default:
+                throw new Error(`GenericOperator.mergeWithHead failed to find match for ${Entity[entity]}`);
+        }
+        newHeadNode.children = [node1, currentHeadNode];
+        result['head'] = newHeadNode;
+        return result;
     }
 }

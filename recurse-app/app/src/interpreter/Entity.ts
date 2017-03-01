@@ -25,6 +25,7 @@ export enum Entity {
     INTERPOLATE,
     RANGE_SHORTHAND,
     ALT_SHORTHAND,
+    MULTIPLY,
     _OPERATORS_END,
 
     VARIABLE,

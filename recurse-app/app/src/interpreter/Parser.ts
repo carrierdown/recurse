@@ -87,11 +87,12 @@ export class Parser {
         }
     }
 
+    // todo: remove - this function creates more problems than it solves
     public static createNode(type: Entity, parent: INode = null, value: any = null, children: Array<INode> = []): INode {
         if (type === Entity.NOTE) {
             value = Note.pitchFromNoteName(value);
-        } else if (value !== true) {
-            value = parseInt(value, 10);
+        } else if (value !== null) {
+            value = parseFloat(value);
         }
 
         switch (type) {
@@ -120,7 +121,6 @@ export class Parser {
             case Entity.REST_SHORTHAND: return new Value(value, parent, ValueType.REST);
             case Entity.RM: return new RhythmicMotive(parent, children);
             case Entity.RND: return new Random(parent, children);
-            case Entity.ROOT: return new Root(value === true);
             case Entity.SELECT: return new Select(parent, SelectStrategy.indexList);
             case Entity.SELECT_INDEX: return new Value(value, parent, ValueType.SELECT_INDEX);
             case Entity.TRANSPOSE: return new Transpose(parent, children);
@@ -220,7 +220,7 @@ export class Parser {
 
     // todo: remove RecurseResult stuff and use exceptions instead
     public static parseTokensToSyntaxTree(tokenSet: Array<IToken>): RecurseResult<ISyntaxTree> {
-        var current: INode = Parser.createNode(Entity.ROOT, null),
+        var current: INode = new Root(false),
             syntaxTree: ISyntaxTree = new SyntaxTree(),
             result: RecurseResult<ISyntaxTree> = new RecurseResult<ISyntaxTree>();
 
@@ -272,6 +272,7 @@ export class Parser {
                 case TokenType.REPEAT:
                 case TokenType.DOUBLE_PERIOD:
                 case TokenType.EQUALS:
+                case TokenType.MULTIPLY:
                     current.children.push(new GenericOperator(tokenSet[i].type));
                     break;
                 /* --- PUNCTUATION --- */
@@ -293,7 +294,7 @@ export class Parser {
                     }
                     i++; // skip a token since we ate the number following _ operator
                     break;
-                case TokenType.MULTIPLY:
+                case TokenType.FILL:
                     // todo: check that we don't add multiple FILL entities to one parent
                     current.children.push(Parser.createNode(Entity.FILL, current));
                     break;
@@ -348,13 +349,13 @@ export class Parser {
                     break;
                 case TokenType.SEMI:
                     // creates new track
-                    let newTrackRoot: INode = Parser.createNode(Entity.ROOT, null, false);
+                    let newTrackRoot: INode = new Root(false);
                     syntaxTree.rootNodes.push(newTrackRoot);
                     current = Parser.createAndAddNodeToChildrenAndRetrieve(newTrackRoot, Entity.CHAIN);
                     break;
                 case TokenType.DOUBLE_SEMI:
                     // creates a new clip
-                    let newClipRoot: INode = Parser.createNode(Entity.ROOT, null, true);
+                    let newClipRoot: INode = new Root(true);
                     syntaxTree.rootNodes.push(newClipRoot);
                     current = Parser.createAndAddNodeToChildrenAndRetrieve(newClipRoot, Entity.CHAIN);
                     break;

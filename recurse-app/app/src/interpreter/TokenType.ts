@@ -12,6 +12,7 @@ export enum TokenType {
     END,
     EQUALS,
     EXCLAMATION,
+    FILL,
     IDENTIFIER,
     LEFT_ANGLE,
     LEFT_BRACE,

@@ -100,6 +100,9 @@ export class Lexer {
         if (char === '.' && nextChar === '.') {
             return {type: TokenType.DOUBLE_PERIOD, value: '..', pos: this.position += 2};
         }
+        if (char === '_' && nextChar === '*') {
+            return {type: TokenType.FILL, value: '_*', pos: this.position += 2};
+        }
         // Look it up in the table of operators
         var op = this.operatorTable[char];
         // special case: x can also be part of an identifier, but if alone it is the repeat token
@@ -212,7 +215,7 @@ export class Lexer {
         token.value = parseFloat(token.value);
         if (isNaN(token.value)) {
             // invalid number, throw error. fix this when rewriting lexer
-            console.log('WARN: Lexer detected invalid number', token.value);
+            throw new Error('WARN: Lexer detected invalid number ' + token.value);
         }
 
         this.position = endpos;
