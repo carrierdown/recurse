@@ -427,6 +427,9 @@ export class Parser {
         for (let node of syntaxTree.rootNodes) {
             resolveOperators(node);
         }
+        for (let varName of Object.getOwnPropertyNames(syntaxTree.variables)) {
+            resolveOperators(syntaxTree.variables[varName]);
+        }
 
         //Parser.printSyntaxTree(syntaxTree);
 
