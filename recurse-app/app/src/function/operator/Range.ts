@@ -32,12 +32,14 @@ export class Range implements INode {
         if (start.valueType !== start.valueType) {
             console.log(`WARN: Range expected arguments of same type, but received ${ValueType[start.valueType]} and ${ValueType[end.valueType]}`);
         }
-        // todo: should support ranges from high to low as well as low to high
         if (startValue > endValue) {
-            [startValue, endValue] = [endValue, startValue];
-        }
-        for (let i = startValue; i <= endValue; i++) {
-            results.push({value: i, valueType: start.valueType});
+            for (let i = startValue; i >= endValue; i--) {
+                results.push({value: i, valueType: start.valueType});
+            }
+        } else {
+            for (let i = startValue; i <= endValue; i++) {
+                results.push({value: i, valueType: start.valueType});
+            }
         }
         return results;
     }
