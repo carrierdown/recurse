@@ -44,7 +44,7 @@ Several constructs are at work in this statement. First of all, we're using the 
 
 I mentioned nested intervals before, let's have a quick look at what that's all about:
 
-`rm(32(1x8) 16(1x8) 8(1x8) 4(1x8) 4(1x16) ns(c3)`
+`rm(32(1x8) 16(1x8) 8(1x8) 4(1x8) 4(1x16)) ns(c3)`
 
 So, what's going on with all these extra parentheses? This is an example of nesting, and it's a powerful feature which lets you specify intervals inside another interval. What's powerful about this is that it allows you to define a block of a given duration, and then decide how this block will be split up. For instance, you could define an interval lasting for a quarter note, and then put three equally sized intervals nested inside it, to produce eigth note triplets:
 
