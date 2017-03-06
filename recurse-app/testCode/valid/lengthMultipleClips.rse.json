@@ -1,0 +1,27 @@
+[
+  {
+    "loopLength": 16,
+    "notes": [
+      { "duration": 4 },
+      { "duration": 4 },
+      { "duration": 4 },
+      { "duration": 4 }
+    ]
+  },
+  {
+    "loopLength": 8,
+    "notes": [
+      { "duration": 4 },
+      { "duration": 4 }
+    ]
+  },
+  {
+    "loopLength": 16,
+    "notes": [
+      { "duration": 4 },
+      { "duration": 4 },
+      { "duration": 4 },
+      { "duration": 4 }
+    ]
+  }
+]
