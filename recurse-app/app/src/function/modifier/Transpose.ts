@@ -1,36 +1,31 @@
-import _ = require('lodash');
 import {INode} from "../../interpreter/INode";
 import {IContext} from "../IContext";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
-import {Scale} from "../../core/type/Scale";
 import {forEachSelectedPitch} from "../../core/util/forEachSelectedPitch";
 import {forEachPitch} from "../../core/util/forEachPitch";
 import {Entity} from "../../interpreter/Entity";
 
 export class Transpose implements INode {
     public type: Entity = Entity.TRANSPOSE;
-    public children: Array<INode> = [];
+    public children: INode[];
     public parent: INode;
 
-    constructor(parent: INode = null, children: Array<INode> = []) {
+    constructor(parent: INode = null, children: INode[] = []) {
         this.parent = parent;
         this.children = children;
     }
 
-    public generate(context: IContext): Array<IRecurseValue> {
-        var results: Array<IRecurseValue> = [],
-            ix: number = 0,
-            rix: number = 0,
-            pix: number = 0,
+    // todo: simplify - we should only do relative pitching according to current mode here, e.g. major, minor, pentatonic, etc
+    // if we instead want to ensure that all notes fall within current scale then something like quantizeScale should be used instead.
+    public generate(context: IContext): IRecurseValue[] {
+        var results: IRecurseValue[] = [],
             doTranspose = (index: number, pitch: number): number => {
-                let degree = results[index % results.length].value;
-                // todo: Temporarily locked to major mode, but this should be a settable property
-                return pitch + (Math.floor(degree / 7) * 12) + (Scale.majorNoteIndexes[degree % 7]);
+                return pitch + context.scale.scaleDegreeToPitchRelative(results[index].value);
             };
 
-        _.forEach(this.children, (child) => {
+        for (let child of this.children) {
             results = results.concat(child.generate(context));
-        });
+        }
 
         if (results.length > 0) {
             if (context.selectionActive) {

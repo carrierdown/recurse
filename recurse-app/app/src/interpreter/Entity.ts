@@ -45,6 +45,7 @@ export enum Entity {
     ODD,
     PITCH_OFFSET,
     RAW_NOTE,
+    SCALE_DEGREE,
     REST_SHORTHAND,
     ROOT,
     SELECT_INDEX,

@@ -1,3 +1,1 @@
-$myVar=(16(4 8 4)x4)
-$myVar2=(16(4 8 4))
-rm($myVar) ns(c3) pitch($myVar2)
+scale(cmajor) rm(6) ns(c3) transpose(0 1 2 3 4 5 6 7 8 9 10)

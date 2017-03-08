@@ -121,6 +121,7 @@ export class Parser {
             case Entity.REST_SHORTHAND: return new Value(value, parent, ValueType.REST);
             case Entity.RM: return new RhythmicMotive(parent, children);
             case Entity.RND: return new Random(parent, children);
+            case Entity.SCALE_DEGREE: return new Value(value, parent, ValueType.SCALE_DEGREE);
             case Entity.SELECT: return new Select(parent, SelectStrategy.indexList);
             case Entity.SELECT_INDEX: return new Value(value, parent, ValueType.SELECT_INDEX);
             case Entity.TRANSPOSE: return new Transpose(parent, children);
@@ -455,7 +456,7 @@ export class Parser {
             case Entity.RM:
                 return Entity.INTERVAL;
             case Entity.NS:
-                return Entity.RAW_NOTE;
+                return Entity.SCALE_DEGREE;
             case Entity.VEL:
                 return Entity.VELOCITY;
             case Entity.TRANSPOSE:

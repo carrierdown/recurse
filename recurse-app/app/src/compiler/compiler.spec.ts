@@ -68,7 +68,7 @@ tape('Testing compiler with valid code', (test) => {
         }
     }, () => {
         test.end();
-    }/*, 'lengthMultipleClips.rse'*/);
+    }/*, 'noteSetWithScaleDegrees.rse'*/);
 });
 
 tape('Testing compiler with invalid code', (test) => {

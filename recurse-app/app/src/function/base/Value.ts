@@ -29,16 +29,22 @@ export class Value implements INode {
         var value = this.value,
             currentValueType = this.valueType;
 
-        if (this.valueType === ValueType.VELOCITY) {
-            value = Helpers.ensureRange(value, 0, 127);
-        }
         if (currentValueType === ValueType.VARIABLE) {
             currentValueType = Parser.resolveVariableValueType(this);
         }
+        switch (currentValueType) {
+            case ValueType.VELOCITY:
+                value = Helpers.ensureRange(value, 0, 127);
+                break;
+            case ValueType.SCALE_DEGREE:
+                value = context.scale.scaleDegreeToPitch(value, context.rootOct);
+                currentValueType = ValueType.RAW_NOTE;
+                break;
+        }
 /*
         if (this.valueType === ValueType.SCALE_DEGREE) {
-            console.log(`Turned ${value} into ${context.scale.scaleDegreeToNote(this.value, context.rootOct)}`);
-            value = context.scale.scaleDegreeToNote(this.value, context.rootOct);
+            console.log(`Turned ${value} into ${context.scale.scaleDegreeToPitch(this.value, context.rootOct)}`);
+            value = context.scale.scaleDegreeToPitch(this.value, context.rootOct);
         }
 */
         return [{value: value, valueType: currentValueType}];

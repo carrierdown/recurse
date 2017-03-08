@@ -2,6 +2,7 @@ import {INode} from "../../interpreter/INode";
 import {IContext} from "../IContext";
 import {IRecurseValue} from "../../core/type/IRecurseValue";
 import {Entity} from "../../interpreter/Entity";
+import {ValueType} from "../../interpreter/ValueType";
 
 export class NoteSet implements INode {
     public type: Entity = Entity.NS;

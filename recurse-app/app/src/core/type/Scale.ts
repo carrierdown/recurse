@@ -1,4 +1,5 @@
 import {Note} from "./Note";
+import {Helpers} from "../util/Helpers";
 
 export class Scale {
     public indexes: Array<number>;
@@ -66,14 +67,27 @@ export class Scale {
         return [0,1,2,3,4,5,6,7,8,9,10,11];
     }
 
-    public scaleDegreeToNote(scaleDegree: number, rootOct: number = 5): number {
-        // how should negative values be handled? -1 scale degree for cmaj equals B, or C one octave down?
-        if (scaleDegree > 0) {
-            scaleDegree -= 1;
+    public scaleDegreeToPitchRelative(scaleDegree: number): number {
+        var pitch: number = 0;
+        if (scaleDegree === 0) {
+            scaleDegree = 1;
         }
-        return this.tonicOffset + Scale.majorNoteIndexes[scaleDegree % this.indexes.length] +
-            (Math.floor(scaleDegree / this.indexes.length) * 12) +
-            (rootOct * 12);
+        var offset = Math.floor(((Math.abs(scaleDegree) - 1) / this.indexes.length)) * 12;
+        if (scaleDegree > 0) {
+            pitch += offset + this.indexes[(scaleDegree - 1) % this.indexes.length];
+        } else {
+            let reverseIndex = Math.abs(scaleDegree) % this.indexes.length,
+                index = 0;
+            if (reverseIndex > 0) {
+                index = this.indexes.length - reverseIndex;
+            }
+            pitch -= offset + 12 - this.indexes[index]
+        }
+        return pitch;
+    }
+
+    public scaleDegreeToPitch(scaleDegree: number, rootOct: number = 5): number {
+        return (rootOct * 12) + this.tonicOffset + this.scaleDegreeToPitchRelative(scaleDegree);
     }
 
     public static getScaleFromName(scaleName: string): Scale {
