@@ -14,7 +14,7 @@ You might ask why you need a new language for this purpose.
 
 ### Status
 
-This project is currently in alpha, and I'm planning to release v1.0 sometime during ~~the autumn of 2016~~2017.
+This project is currently on hold. I'm focusing my efforts on finishing version 1 of [mutate4l](https://github.com/carrierdown/m4l-offline-clip-processor), which can be seen as a simplified processing-oriented version of `re<urse`. Depending on how the mutate4l project develops, I might decide to expand it by porting over more functionality from `re<urse`. `re<urse` in its current state might thus be abandoned. However, having worked on this project for several years I'm not planning on throwing it away any time soon, but it might resurface in a different shape and context.
 
 ## Introduction
 
